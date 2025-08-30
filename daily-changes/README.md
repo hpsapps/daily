@@ -1,69 +1,108 @@
-# React + TypeScript + Vite
+# Daily Changes - Teacher Absence Management System
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This project is a Teacher Absence Management System, developed as a Single Page Application (SPA) using React, designed to help schools manage teacher absences, RFF (Release From Face-to-Face) allocations, duty assignments, and casual teacher instructions.
 
-Currently, two official plugins are available:
+## Purpose
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+The primary goal of "Daily Changes" is to streamline the process of managing teacher absences and the subsequent re-allocation of duties and classes to casual teachers or other staff. It aims to provide a user-friendly interface for uploading school data, tracking RFF debts, managing casual teacher information, and generating essential daily instructions.
 
-## Expanding the ESLint configuration
+## Tech Stack
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+*   **Frontend:** React 18+ with functional components and hooks
+*   **Styling:** Tailwind CSS + shadcn/ui components
+*   **State Management:** React Context + useReducer for complex state
+*   **File Processing:** `xlsx` library for Excel parsing
+*   **Storage:** `localStorage` for MVP (database-ready structure)
+*   **Routing:** React Router for multi-page navigation
+*   **Build:** Vite for development and build process
+*   **TypeScript:** For type safety and improved developer experience
 
-```js
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## Project Structure
 
-      // Remove tseslint.configs.recommended and replace with this
-      ...tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      ...tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      ...tseslint.configs.stylisticTypeChecked,
+The application follows a modular project structure:
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```
+src/
+├── components/
+│   ├── ui/ (shadcn components)
+│   ├── layout/ (e.g., Navbar)
+│   ├── upload/ (e.g., FileUploadArea)
+│   ├── absence/ (e.g., TeacherSelector)
+│   ├── assignment/ (e.g., CasualInstructionGenerator, DutyManager)
+│   ├── output/
+│   └── rff-payback/ (e.g., DebtTable, ManualEntryForm)
+│   └── settings/ (e.g., SchoolInfoForm, CasualTeacherManager, DataManagement)
+├── contexts/ (e.g., AppContext)
+├── hooks/
+├── utils/ (e.g., excelParser, storage)
+├── types/ (TypeScript interfaces)
+└── pages/ (Main application pages)
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Features Implemented (Phase 1 & Phase 2)
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+### Phase 1: Core MVP
+*   **Project Initialization & Basic Setup:**
+    *   React project initialized with Vite and TypeScript.
+    *   Tailwind CSS configured.
+    *   React Router set up for navigation.
+    *   Initial `src` directory structure created.
+*   **Core Data Models & Global State Management:**
+    *   All necessary TypeScript interfaces defined.
+    *   Global state management implemented using React Context and `useReducer`, with `localStorage` persistence.
+*   **SetupPage Component (`/setup`):**
+    *   File upload area created for `.xlsx` files.
+    *   Basic Excel parsing logic implemented with validation for required sheets and columns.
+*   **AbsenceManagementPage Component (Default Route `/`):**
+    *   Basic layout with a `TeacherSelector` (using `shadcn` Combobox).
+    *   Placeholder components for `CasualInstructionGenerator` and `DutyManager`.
 
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+### Phase 2: Enhanced UX
+*   **UI/UX Refinement & Shadcn Integration:**
+    *   `shadcn/ui` components integrated throughout the application.
+    *   A `Navbar` added for easy navigation.
+*   **Robust Error Handling & Validation:**
+    *   Enhanced Excel parsing with comprehensive validation.
+*   **RFF Payback Tracking (`/rff-payback`):**
+    *   `RFFPaybackPage` layout updated.
+    *   `DebtTable`, `PaymentHistoryTable`, `ManualEntryForm`, and `DebtSummaryCards` components implemented.
+*   **Settings and Configuration (`/settings`):**
+    *   `SettingsPage` layout updated.
+    *   `SchoolInfoForm`, `CasualTeacherManager`, and `DataManagement` components implemented.
+*   **Casual Instruction Generation & Duty Management:**
+    *   `CasualInstructionGenerator` and `DutyManager` components integrated into the Absence Management page.
+
+## Getting Started
+
+To run the application locally:
+
+1.  **Clone the repository:**
+    ```bash
+    git clone [repository-url] daily-changes
+    cd daily-changes
+    ```
+2.  **Install dependencies:**
+    ```bash
+    npm install
+    ```
+3.  **Start the development server:**
+    ```bash
+    npm run dev
+    ```
+    The application will typically run on `http://localhost:5173/` (or another available port).
+
+## Usage
+
+*   **Navigation:** Use the Navbar to navigate between "Absence Management", "Setup", "RFF Payback", and "Settings" pages.
+*   **Setup Page (`/setup`):** Upload an Excel file containing "RFF/Duties" and "Teacher-Class Map" sheets to populate the application with data.
+*   **Absence Management Page (`/`):** Select teachers, view conflicts, and manage assignments (currently with placeholder components).
+*   **RFF Payback Page (`/rff-payback`):** View current and cleared RFF debts, add new debts manually, and see a summary.
+*   **Settings Page (`/settings`):** Manage school information, casual teachers, and export application data.
+
+## Next Steps (Phase 3)
+
+*   Advanced Assignment Features
+*   Print-Optimized Output & Export
+*   Performance Improvements
+*   Comprehensive Testing
+*   Deployment Preparation
