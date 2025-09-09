@@ -1,0 +1,34 @@
+[
+  {
+    "title": "Before School",
+    "times": ["08:35 - 09:05"]
+  },
+  {
+    "title": "Morning session",
+    "times": ["09:10-09:50", "09:50-10:30", "10:30-11:10"]
+  },
+  {
+    "title": "Recess",
+    "times": ["11:10 - 11:35"]
+  },
+  {
+    "title": "Middle session",
+    "times": ["11:35-12:15", "12:15-12:55"]
+  },
+  {
+    "title": "Lunch 1st",
+    "times": ["13:05 - 13:25"]
+  },
+  {
+    "title": "Lunch 2nd",
+    "times": ["13:25 - 13:45"]
+  },
+  {
+    "title": "Afternoon session",
+    "times": ["13:45-14:25", "14:25-15:05"]
+  },
+  {
+    "title": "After School",
+    "times": ["15:05"]
+  }
+]

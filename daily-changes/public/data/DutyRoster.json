@@ -1,0 +1,382 @@
+[
+    {
+        "Duty":"Before School",
+        "Time":"08:35 - 09:05",
+        "Area":"C St gate",
+        "Monday":"Lisa",
+        "Tuesday":"Lisa",
+        "Wednesday":"Lisa",
+        "Thursday":"Tanya",
+        "Friday":"Katherine\/ Tanya"
+    },
+    {
+        "Duty":"Before School",
+        "Time":"08:35 - 09:05",
+        "Area":"W St gate",
+        "Monday":"Susan",
+        "Tuesday":"Susan",
+        "Wednesday":"Susan",
+        "Thursday":"Susan",
+        "Friday":"Tarsh"
+    },
+    {
+        "Duty":"Before School",
+        "Time":"08:35 - 09:05",
+        "Area":"Lines K-2",
+        "Monday":"Katherine",
+        "Tuesday":"Katherine",
+        "Wednesday":"Katherine",
+        "Thursday":"Kindy Team",
+        "Friday":"Katherine"
+    },
+    {
+        "Duty":"Before School",
+        "Time":"08:35 - 09:05",
+        "Area":"Lines 1-2",
+        "Monday":"Tanya",
+        "Tuesday":"Tanya",
+        "Wednesday":"Tarsh",
+        "Thursday":"Tarsh",
+        "Friday":"Tarsh"
+    },
+    {
+        "Duty":"Before School",
+        "Time":"08:35 - 09:05",
+        "Area":"Lines 3-6",
+        "Monday":"Liz W",
+        "Tuesday":"Rachel",
+        "Wednesday":"Kati H",
+        "Thursday":"Jeanette",
+        "Friday":"Jeanette"
+    },
+    {
+        "Duty":"Before School",
+        "Time":"08:35 - 09:05",
+        "Area":"A (3-6)",
+        "Monday":"Alice",
+        "Tuesday":"Clair S",
+        "Wednesday":"Claire D",
+        "Thursday":"Aleta",
+        "Friday":"Katie"
+    },
+    {
+        "Duty":"Before School",
+        "Time":"08:35 - 09:05",
+        "Area":"B (3-6)",
+        "Monday":"Chelsea",
+        "Tuesday":"Aliy",
+        "Wednesday":"Holly",
+        "Thursday":"Dane",
+        "Friday":"Alice"
+    },
+    {
+        "Duty":"Before School",
+        "Time":"08:35 - 09:05",
+        "Area":"C (Kindy)",
+        "Monday":"Liz C",
+        "Tuesday":"Katherine",
+        "Wednesday":"Narelle",
+        "Thursday":"Bronwyn",
+        "Friday":"Veronica"
+    },
+    {
+        "Duty":"Before School",
+        "Time":"08:35 - 09:05",
+        "Area":"D (Y1-2)",
+        "Monday":"Giuseppe",
+        "Tuesday":"Giuseppe",
+        "Wednesday":"Giuseppe",
+        "Thursday":"Giuseppe",
+        "Friday":"Aliy"
+    },
+    {
+        "Duty":"Recess",
+        "Time":"11:10 - 11:35",
+        "Area":"A (3-5)",
+        "Monday":"Gabrielle",
+        "Tuesday":"Katie",
+        "Wednesday":"Anna",
+        "Thursday":"Gemma",
+        "Friday":"Holly"
+    },
+    {
+        "Duty":"Recess",
+        "Time":"11:10 - 11:35",
+        "Area":"B (3-6)",
+        "Monday":"Katie",
+        "Tuesday":"Michael",
+        "Wednesday":"Jen B",
+        "Thursday":"Fiona",
+        "Friday":"Sarah S"
+    },
+    {
+        "Duty":"Recess",
+        "Time":"11:10 - 11:35",
+        "Area":"C (K) - Equip",
+        "Monday":"Sophie",
+        "Tuesday":"Helen",
+        "Wednesday":"Nikki",
+        "Thursday":"Maz",
+        "Friday":"Liz C"
+    },
+    {
+        "Duty":"Recess",
+        "Time":"11:10 - 11:35",
+        "Area":"C (K) - Multi",
+        "Monday":"Narelle",
+        "Tuesday":"Veronica",
+        "Wednesday":"Katherine",
+        "Thursday":"Nikki",
+        "Friday":"Sophie"
+    },
+    {
+        "Duty":"Recess",
+        "Time":"11:10 - 11:35",
+        "Area":"D (Y1-2)",
+        "Monday":"Jen Y",
+        "Tuesday":"Tarsh",
+        "Wednesday":"Sarah O",
+        "Thursday":"Jen B",
+        "Friday":"Renee"
+    },
+    {
+        "Duty":"Recess",
+        "Time":"11:10 - 11:35",
+        "Area":"Garden (3-5)",
+        "Monday":"Aliy",
+        "Tuesday":"Elise",
+        "Wednesday":"Kylie",
+        "Thursday":"Kylie",
+        "Friday":"Aleta"
+    },
+    {
+        "Duty":"Recess",
+        "Time":"11:10 - 11:35",
+        "Area":"E (Year 6)",
+        "Monday":"Jed",
+        "Tuesday":"Gabrielle",
+        "Wednesday":"Kati H",
+        "Thursday":"Clair S",
+        "Friday":"Kati H"
+    },
+    {
+        "Duty":"1st Lunch",
+        "Time":"13:05 - 13:25",
+        "Area":"A (3-5)",
+        "Monday":"Karen R",
+        "Tuesday":"Gemma",
+        "Wednesday":"Chelsea",
+        "Thursday":"Christine",
+        "Friday":"Penny"
+    },
+    {
+        "Duty":"1st Lunch",
+        "Time":"13:05 - 13:25",
+        "Area":"B (3-5)",
+        "Monday":"Aleta",
+        "Tuesday":"Christina",
+        "Wednesday":"Renee",
+        "Thursday":"Liz W",
+        "Friday":"Gemma"
+    },
+    {
+        "Duty":"1st Lunch",
+        "Time":"13:05 - 13:25",
+        "Area":"Park",
+        "Monday":"Matt",
+        "Tuesday":"Dane",
+        "Wednesday":"Clair S",
+        "Thursday":"Jed",
+        "Friday":"CLOSED"
+    },
+    {
+        "Duty":"1st Lunch",
+        "Time":"13:05 - 13:25",
+        "Area":"Park",
+        "Monday":"Rachel",
+        "Tuesday":"Matt W1 only",
+        "Wednesday":"Penny",
+        "Thursday":"Katie N",
+        "Friday":"CLOSED"
+    },
+    {
+        "Duty":"1st Lunch",
+        "Time":"13:05 - 13:25",
+        "Area":"C (K) - Equip",
+        "Monday":"Bronwyn",
+        "Tuesday":"Sarah O",
+        "Wednesday":"Elise",
+        "Thursday":"Sophie",
+        "Friday":"Bronwyn"
+    },
+    {
+        "Duty":"1st Lunch",
+        "Time":"13:05 - 13:25",
+        "Area":"C (K) - Multi",
+        "Monday":"Claire D",
+        "Tuesday":"Bronwyn",
+        "Wednesday":"Liz C",
+        "Thursday":"Helen",
+        "Friday":"Karen R"
+    },
+    {
+        "Duty":"1st Lunch",
+        "Time":"13:05 - 13:25",
+        "Area":"D (Y1-2)",
+        "Monday":"Sarah O",
+        "Tuesday":"Belinda",
+        "Wednesday":"Aliy",
+        "Thursday":"Tarsh",
+        "Friday":"Helen"
+    },
+    {
+        "Duty":"1st Lunch",
+        "Time":"13:05 - 13:25",
+        "Area":"Garden (3-5)",
+        "Monday":"Daana",
+        "Tuesday":"Daana",
+        "Wednesday":"Katie N",
+        "Thursday":"Katie",
+        "Friday":"Elise"
+    },
+    {
+        "Duty":"1st Lunch",
+        "Time":"13:05 - 13:25",
+        "Area":"E (Year 6)",
+        "Monday":"Holly",
+        "Tuesday":"Holly",
+        "Wednesday":"Matt",
+        "Thursday":"Anna",
+        "Friday":"Rachel if no PSSA"
+    },
+    {
+        "Duty":"1st Lunch",
+        "Time":"13:05 - 13:25",
+        "Area":"Library",
+        "Monday":"Sarah S",
+        "Tuesday":"Sarah S week 1",
+        "Wednesday":"Sarah S",
+        "Thursday":"Sarah S",
+        "Friday":"CLOSED"
+    },
+    {
+        "Duty":"2nd Lunch",
+        "Time":"13:25 - 13:45",
+        "Area":"A (3-5)",
+        "Monday":"Belinda",
+        "Tuesday":"Claire D",
+        "Wednesday":"James",
+        "Thursday":"Chelsea",
+        "Friday":"Christina"
+    },
+    {
+        "Duty":"2nd Lunch",
+        "Time":"13:25 - 13:45",
+        "Area":"B (3-5)",
+        "Monday":"Michael",
+        "Tuesday":"Margot",
+        "Wednesday":"Christina",
+        "Thursday":"Jeanette",
+        "Friday":"James"
+    },
+    {
+        "Duty":"2nd Lunch",
+        "Time":"13:25 - 13:45",
+        "Area":"Park",
+        "Monday":"Matt",
+        "Tuesday":"Dane",
+        "Wednesday":"Clair S",
+        "Thursday":"Jed",
+        "Friday":"CLOSED"
+    },
+    {
+        "Duty":"2nd Lunch",
+        "Time":"13:25 - 13:45",
+        "Area":"Park",
+        "Monday":"Rachel",
+        "Tuesday":"Matt W1 only",
+        "Wednesday":"Penny",
+        "Thursday":"Katie N",
+        "Friday":"CLOSED"
+    },
+    {
+        "Duty":"2nd Lunch",
+        "Time":"13:25 - 13:45",
+        "Area":"C (K) - Equip",
+        "Monday":"Christine",
+        "Tuesday":"Narelle",
+        "Wednesday":"Helen",
+        "Thursday":"Liz C",
+        "Friday":"Nikki"
+    },
+    {
+        "Duty":"2nd Lunch",
+        "Time":"13:25 - 13:45",
+        "Area":"C (K) - Multi",
+        "Monday":"Veronica",
+        "Tuesday":"Jen Y",
+        "Wednesday":"Maz",
+        "Thursday":"Veronica",
+        "Friday":"Amanda"
+    },
+    {
+        "Duty":"2nd Lunch",
+        "Time":"13:25 - 13:45",
+        "Area":"Garden (3-5)",
+        "Monday":"Grant",
+        "Tuesday":"Penny",
+        "Wednesday":"Jen Y",
+        "Thursday":"Elise",
+        "Friday":"Christine"
+    },
+    {
+        "Duty":"2nd Lunch",
+        "Time":"13:25 - 13:45",
+        "Area":"D (Y1-2)",
+        "Monday":"Fiona",
+        "Tuesday":"Renee",
+        "Wednesday":"Fiona",
+        "Thursday":"Jen Y",
+        "Friday":"Jen B"
+    },
+    {
+        "Duty":"2nd Lunch",
+        "Time":"13:25 - 13:45",
+        "Area":"E (Year 6)",
+        "Monday":"Anna",
+        "Tuesday":"Kati H",
+        "Wednesday":"Christine",
+        "Thursday":"Michael",
+        "Friday":"Anna if no PSSA"
+    },
+    {
+        "Duty":"2nd Lunch",
+        "Time":"13:25 - 13:45",
+        "Area":"Library",
+        "Monday":"Jeanette",
+        "Tuesday":"Daana",
+        "Wednesday":null,
+        "Thursday":"Sarah O",
+        "Friday":"CLOSED"
+    },
+    {
+        "Duty":"After School",
+        "Time":"15:05",
+        "Area":"W St gate",
+        "Monday":"Priscilla",
+        "Tuesday":"Priscilla",
+        "Wednesday":"Priscilla",
+        "Thursday":"Priscilla",
+        "Friday":"Priscilla"
+    },
+    {
+        "Duty":"After School",
+        "Time":"15:05",
+        "Area":"Bus St gate",
+        "Monday":"Tanya",
+        "Tuesday":"Christine",
+        "Wednesday":"Tanya",
+        "Thursday":"Karen R",
+        "Friday":"Liz W"
+    }
+]

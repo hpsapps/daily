@@ -2,16 +2,16 @@ import { Routes, Route } from 'react-router-dom';
 import { AppProvider } from './contexts/AppContext';
 import Navbar from './components/layout/Navbar';
 import SetupPage from './pages/SetupPage';
-import AbsenceManagementPage from './pages/AbsenceManagementPage';
 import RFFPaybackPage from './pages/RFFPaybackPage';
 import SettingsPage from './pages/SettingsPage';
+import CasualManagerPage from './pages/CasualManagerPage';
 
 function App() {
   return (
     <AppProvider>
       <Navbar />
       <Routes>
-        <Route path="/" element={<AbsenceManagementPage />} />
+        <Route path="/" element={<CasualManagerPage />} />
         <Route path="/setup" element={<SetupPage />} />
         <Route path="/rff-payback" element={<RFFPaybackPage />} />
         <Route path="/settings" element={<SettingsPage />} />

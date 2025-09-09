@@ -1,5 +1,5 @@
 import { createContext, useReducer, type ReactNode, useEffect } from 'react';
-import type { AppState, Teacher, TeacherClassMap, RFFSlot, DutySlot, RFFDebt, CasualTeacher } from '../types';
+import type { AppState, Teacher, TeacherClassMap, RFFSlot, DutySlot, RFFDebt, CasualTeacher, DutyAssignment } from '../types';
 import { storage } from '../utils/storage';
 
 type AppAction =
@@ -11,7 +11,9 @@ type AppAction =
   | { type: 'UPDATE_CASUAL'; payload: CasualTeacher }
   | { type: 'DELETE_CASUAL'; payload: string }
   | { type: 'ADD_ABSENT_TEACHER'; payload: string }
-  | { type: 'REMOVE_ABSENT_TEACHER'; payload: string };
+  | { type: 'REMOVE_ABSENT_TEACHER'; payload: string }
+  | { type: 'ADD_MANUAL_DUTY'; payload: DutyAssignment }
+  | { type: 'DELETE_MANUAL_DUTY'; payload: number };
 
 const APP_STORAGE_KEY = 'dailyChangesAppState';
 
@@ -34,6 +36,7 @@ const initialState: AppState = {
     { id: 'D001', teacherId: 'T001', day: 'Monday', timeSlot: 'Recess', area: 'Playground' },
     { id: 'D002', teacherId: 'T002', day: 'Tuesday', timeSlot: 'Lunch 1', area: 'Canteen' },
   ],
+  manualDuties: [],
   rffDebts: [
     { id: 'DEBT001', teacherId: 'T001', hoursOwed: 2.5, reason: 'Covering for sick leave', dateCreated: new Date('2025-08-20T09:00:00Z') },
     { id: 'DEBT002', teacherId: 'T002', hoursOwed: 1.0, reason: 'Professional development', dateCreated: new Date('2025-08-22T10:00:00Z'), dateCleared: new Date('2025-08-25T14:00:00Z'), clearedBy: 'Admin' },
@@ -91,6 +94,16 @@ const appReducer = (state: AppState, action: AppAction): AppState => {
       return {
         ...state,
         absentTeachers: state.absentTeachers.filter(id => id !== action.payload),
+      };
+    case 'ADD_MANUAL_DUTY':
+      return {
+        ...state,
+        manualDuties: [...state.manualDuties, action.payload],
+      };
+    case 'DELETE_MANUAL_DUTY':
+      return {
+        ...state,
+        manualDuties: state.manualDuties.filter((_, index) => index !== action.payload),
       };
     default:
       return state;

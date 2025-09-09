@@ -86,6 +86,7 @@ export interface AppState {
   teacherClassMap: TeacherClassMap[];
   rffSlots: RFFSlot[];
   dutySlots: DutySlot[];
+  manualDuties: DutyAssignment[];
   rffDebts: RFFDebt[];
   casuals: CasualTeacher[];
   absentTeachers: string[];

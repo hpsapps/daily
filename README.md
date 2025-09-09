@@ -1,2 +1,0 @@
-# daily
-Daily teacher changes
