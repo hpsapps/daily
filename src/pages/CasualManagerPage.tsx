@@ -5,14 +5,11 @@ import { loadRFFData, findRFFForTeacher, findRFFForClass } from '../data/RFFRost
 import { getRFFPaybackList } from '../data/RFFPaybackData';
 import { getTeacherClass, getTeachersByRole, getTeacherInfo } from '../data/ClassTeacher';
 import { loadTimeSlotsData, getSessionTitle } from '../data/TimeSlots';
-import { ComboboxDemo as Combobox } from '../components/ui/combobox';
 import { Button } from '../components/ui/button';
 import { Card } from '../components/ui/card';
 import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
-import { Popover, PopoverContent, PopoverTrigger } from '../components/ui/popover';
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '../components/ui/command';
-import { Check, ChevronsUpDown } from 'lucide-react';
+import { TeacherCasualSearch } from '../components/custom/TeacherCasualSearch';
 import { cn } from '../lib/utils';
 import {
   Dialog,
@@ -36,14 +33,12 @@ function CasualManagerPage() {
     const { manualDuties } = state;
     const [selectedTeacher, setSelectedTeacher] = useState('');
     const [selectedCasual, setSelectedCasual] = useState('');
-    const [searchTerm, setSearchTerm] = useState('');
-    const [casualSearchTerm, setCasualSearchTerm] = useState(''); // New state for casual search
+    // Removed searchTerm and casualSearchTerm as they are now managed internally by TeacherCasualSearch
     const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
     const [schedule, setSchedule] = useState<any>(null);
     const [spreadsheetData, setSpreadsheetData] = useState('');
     const [isLoading, setIsLoading] = useState(true);
-    const [teacherComboboxOpen, setTeacherComboboxOpen] = useState(false);
-    const [casualComboboxOpen, setCasualComboboxOpen] = useState(false); // New state for casual combobox
+    // Removed teacherComboboxOpen and casualComboboxOpen as they are now managed internally by TeacherCasualSearch
     const [isAddDutyModalOpen, setIsAddDutyModalOpen] = useState(false);
     const [newDutyTimeSlot, setNewDutyTimeSlot] = useState('');
     const [newDutyLocation, setNewDutyLocation] = useState('');
@@ -70,12 +65,12 @@ function CasualManagerPage() {
 
     const handleTeacherSelect = (teacher: string) => {
         setSelectedTeacher(teacher);
-        setTeacherComboboxOpen(false);
+        // searchTerm is now managed by TeacherCasualSearch internally
     };
 
     const handleCasualSelect = (casual: string) => {
         setSelectedCasual(casual);
-        setCasualComboboxOpen(false);
+        // casualSearchTerm is now managed by TeacherCasualSearch internally
     };
 
     const handleDateChange = (offset: number) => {
@@ -188,55 +183,15 @@ function CasualManagerPage() {
                 <aside className="lg:col-span-1">
                     <Card className="p-6 flex flex-col gap-4">
                         <h2 className="text-xl font-bold mb-2">Controls</h2>
-                        <div className="control-group flex flex-col gap-2">
-                            <Label htmlFor="teacher-search">Absent Teacher</Label>
-                            <Popover open={teacherComboboxOpen} onOpenChange={setTeacherComboboxOpen}>
-                                <PopoverTrigger asChild>
-                                    <Input
-                                        id="teacher-search"
-                                        placeholder="Search teacher..."
-                                        value={selectedTeacher || searchTerm}
-                                        onChange={(e) => {
-                                            setSearchTerm(e.target.value);
-                                            setTeacherComboboxOpen(true);
-                                            setSelectedTeacher(''); // Clear selected teacher when typing
-                                        }}
-                                        onFocus={() => setTeacherComboboxOpen(true)}
-                                        className="w-full"
-                                        disabled={isLoading}
-                                    />
-                                </PopoverTrigger>
-                                <PopoverContent className="w-[--radix-popover-trigger-width] p-0" align="start" sideOffset={4}>
-                                    <Command>
-                                        <CommandList>
-                                            <CommandEmpty>No teacher found.</CommandEmpty>
-                                            <CommandGroup>
-                                                {allTeachers.filter(teacher =>
-                                                    teacher.toLowerCase().includes(searchTerm.toLowerCase())
-                                                ).map((teacher) => (
-                                                    <CommandItem
-                                                        key={teacher}
-                                                        value={teacher}
-                                                        onSelect={(currentValue) => {
-                                                            handleTeacherSelect(currentValue === selectedTeacher ? "" : currentValue);
-                                                            setSearchTerm(currentValue); // Keep search term updated with selected value
-                                                        }}
-                                                    >
-                                                        <Check
-                                                            className={cn(
-                                                                "mr-2 h-4 w-4",
-                                                                selectedTeacher === teacher ? "opacity-100" : "opacity-0"
-                                                            )}
-                                                        />
-                                                        {teacher}
-                                                    </CommandItem>
-                                                ))}
-                                            </CommandGroup>
-                                        </CommandList>
-                                    </Command>
-                                </PopoverContent>
-                            </Popover>
-                        </div>
+                        <TeacherCasualSearch
+                            id="teacher-search"
+                            label="Absent Teacher"
+                            placeholder="Search for a teacher..."
+                            items={allTeachers}
+                            selectedValue={selectedTeacher}
+                            onValueChange={handleTeacherSelect}
+                            isLoading={isLoading}
+                        />
                         <div className="control-group flex flex-col gap-2">
                             <Label htmlFor="date-select">Date</Label>
                             <div className="flex">
@@ -245,54 +200,15 @@ function CasualManagerPage() {
                                 <Button variant="outline" onClick={() => handleDateChange(1)} className="rounded-l-none">Next ›</Button>
                             </div>
                         </div>
-                        <div className="control-group flex flex-col gap-2">
-                            <Label htmlFor="casual-select">Assign Casual</Label>
-                            <Popover open={casualComboboxOpen} onOpenChange={setCasualComboboxOpen}>
-                                <PopoverTrigger asChild>
-                                    <Input
-                                        id="casual-select"
-                                        placeholder="Search casual..."
-                                        value={selectedCasual || casualSearchTerm}
-                                        onChange={(e) => {
-                                            setCasualSearchTerm(e.target.value);
-                                            setCasualComboboxOpen(true);
-                                            setSelectedCasual(''); // Clear selected casual when typing
-                                        }}
-                                        onFocus={() => setCasualComboboxOpen(true)}
-                                        className="w-full"
-                                    />
-                                </PopoverTrigger>
-                                <PopoverContent className="w-[--radix-popover-trigger-width] p-0" align="start" sideOffset={4}>
-                                    <Command>
-                                        <CommandList>
-                                            <CommandEmpty>No casual found.</CommandEmpty>
-                                            <CommandGroup>
-                                                {allCasuals.filter(casual =>
-                                                    casual.toLowerCase().includes(casualSearchTerm.toLowerCase())
-                                                ).map((casual) => (
-                                                    <CommandItem
-                                                        key={casual}
-                                                        value={casual}
-                                                        onSelect={(currentValue) => {
-                                                            handleCasualSelect(currentValue === selectedCasual ? "" : currentValue);
-                                                            setCasualSearchTerm(currentValue); // Keep search term updated with selected value
-                                                        }}
-                                                    >
-                                                        <Check
-                                                            className={cn(
-                                                                "mr-2 h-4 w-4",
-                                                                selectedCasual === casual ? "opacity-100" : "opacity-0"
-                                                            )}
-                                                        />
-                                                        {casual}
-                                                    </CommandItem>
-                                                ))}
-                                            </CommandGroup>
-                                        </CommandList>
-                                    </Command>
-                                </PopoverContent>
-                            </Popover>
-                        </div>
+                        <TeacherCasualSearch
+                            id="casual-select"
+                            label="Assign Casual"
+                            placeholder="Search casual..."
+                            items={allCasuals}
+                            selectedValue={selectedCasual}
+                            onValueChange={handleCasualSelect}
+                            isLoading={isLoading}
+                        />
                         <div className="control-group flex gap-2 mt-auto">
                             <Button onClick={() => setIsAddDutyModalOpen(true)} variant="outline" className="flex-grow">Add Duty</Button>
                             <Button 
