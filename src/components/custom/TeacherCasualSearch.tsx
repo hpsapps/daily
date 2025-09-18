@@ -6,7 +6,7 @@ import { Check } from 'lucide-react';
 
 interface TeacherCasualSearchProps {
     id: string;
-    label: string;
+    label?: string; // Made optional
     placeholder: string;
     items: string[];
     selectedValue: string;
@@ -67,7 +67,7 @@ export function TeacherCasualSearch({
                         filteredItems.map(item => (
                             <div
                                 key={item}
-                                className="relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none bg-white text-black hover:bg-gray-100"
+                                className="relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none hover:bg-gray-100"
                                 onMouseDown={() => handleSelect(item)}
                             >
                                 <Check
@@ -80,8 +80,8 @@ export function TeacherCasualSearch({
                             </div>
                         ))
                     ) : (
-                        <div className="p-2 text-sm text-gray-500 bg-white text-black">
-                            No matching {label.toLowerCase()} found.
+                        <div className="p-2 text-sm text-gray-500">
+                            No matching {label ? label.toLowerCase() : 'items'} found.
                         </div>
                     )}
                 </div>
