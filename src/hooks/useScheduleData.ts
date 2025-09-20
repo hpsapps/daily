@@ -4,6 +4,7 @@ import { loadDutyData, findDutiesForTeacher } from '../data/DutyRoster';
 import { loadRFFData, findRFFForTeacher, findRFFForClass } from '../data/RFFRoster';
 import { getTeacherClass, getTeacherInfo } from '../data/ClassTeacher';
 import { loadTimeSlotsData } from '../data/TimeSlots';
+import { getTermAndWeek } from '../utils/termCalculator';
 
 export function useScheduleData() {
     const { state } = useContext(AppContext);
@@ -11,6 +12,7 @@ export function useScheduleData() {
     const [selectedTeacher, setSelectedTeacher] = useState('');
     const [selectedCasual, setSelectedCasual] = useState('');
     const [selectedDates, setSelectedDates] = useState<Date[]>([new Date()]);
+    const [currentDateIndex, setCurrentDateIndex] = useState(0);
     const [schedule, setSchedule] = useState<any>(null);
     const [spreadsheetData, setSpreadsheetData] = useState('');
     const [isLoading, setIsLoading] = useState(true);
@@ -25,16 +27,27 @@ export function useScheduleData() {
     }, []);
 
     useEffect(() => {
+        // Ensure currentDateIndex is valid when selectedDates changes
+        if (selectedDates.length > 0 && currentDateIndex >= selectedDates.length) {
+            setCurrentDateIndex(selectedDates.length - 1);
+        } else if (selectedDates.length === 0) {
+            setCurrentDateIndex(0);
+        }
+    }, [selectedDates, currentDateIndex]);
+
+    useEffect(() => {
         if (isLoading || !selectedTeacher || selectedDates.length === 0) {
             setSchedule(null);
             return;
         }
 
-        const date = selectedDates[0];
+        const date = selectedDates[currentDateIndex]; // Use currentDateIndex
         const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
         const dayOfWeek = days[date.getDay()];
         const options: Intl.DateTimeFormatOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
         const formattedDate = date.toLocaleDateString('en-AU', options);
+
+        const termInfo = getTermAndWeek(date); // Get term and week information
 
         const inheritedDuties = findDutiesForTeacher(selectedTeacher, dayOfWeek as any);
         const duties = [...inheritedDuties, ...manualDuties];
@@ -57,9 +70,10 @@ export function useScheduleData() {
             formattedDate: formattedDate,
             duties,
             rffSlots: allRFFSlots,
-            assignedCasual: selectedCasual
+            assignedCasual: selectedCasual,
+            termInfo: termInfo // Add termInfo to the schedule
         });
-    }, [selectedTeacher, selectedDates, isLoading, selectedCasual, manualDuties]);
+    }, [selectedTeacher, selectedDates, currentDateIndex, isLoading, selectedCasual, manualDuties]); // Add currentDateIndex to dependencies
 
     const handleTeacherSelect = (teacher: string) => {
         setSelectedTeacher(teacher);
@@ -67,6 +81,14 @@ export function useScheduleData() {
 
     const handleCasualSelect = (casual: string) => {
         setSelectedCasual(casual);
+    };
+
+    const handlePreviousDate = () => {
+        setCurrentDateIndex(prevIndex => Math.max(0, prevIndex - 1));
+    };
+
+    const handleNextDate = () => {
+        setCurrentDateIndex(prevIndex => Math.min(selectedDates.length - 1, prevIndex + 1));
     };
 
     const handleGenerateSpreadsheet = () => {
@@ -98,7 +120,11 @@ export function useScheduleData() {
         handleTeacherSelect,
         handleCasualSelect,
         setSelectedDates,
+        currentDateIndex,
+        handlePreviousDate,
+        handleNextDate,
         handleGenerateSpreadsheet,
-        setSpreadsheetData
+        setSpreadsheetData,
+        termInfo: schedule?.termInfo // Return termInfo explicitly
     };
 }

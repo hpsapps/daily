@@ -1,6 +1,7 @@
 import SchoolInfoForm from '../components/settings/SchoolInfoForm';
 import CasualTeacherManager from '../components/settings/CasualTeacherManager';
 import DataManagement from '../components/settings/DataManagement';
+import CalendarUpload from '../components/settings/CalendarUpload';
 
 const SettingsPage = () => {
   return (
@@ -18,6 +19,10 @@ const SettingsPage = () => {
         <div>
           <h2 className="text-xl font-semibold mb-2">Data Management</h2>
           <DataManagement />
+        </div>
+        <div>
+          <h2 className="text-xl font-semibold mb-2">School Calendar</h2>
+          <CalendarUpload />
         </div>
       </div>
     </div>
