@@ -1,6 +1,5 @@
-import React, { useState, useContext } from 'react';
+import { useState, useContext } from 'react';
 import { AppContext } from '../contexts/AppContext';
-import { Button } from '../components/ui/button';
 import { useScheduleData } from '../hooks/useScheduleData';
 import { useTeacherAndCasualLists } from '../hooks/useTeacherAndCasualLists';
 import { TeacherSearchCard } from '../components/features/home-dashboard/TeacherSearchCard';
@@ -10,7 +9,7 @@ import { AssignmentPreview } from '../components/features/home-dashboard/Assignm
 import AddManualDutyDialog from '../components/features/manual-duty/AddManualDutyDialog';
 
 function NewHomePage() {
-    const { dispatch } = useContext(AppContext);
+    const {  } = useContext(AppContext);
     const [isAddDutyModalOpen, setIsAddDutyModalOpen] = useState(false);
 
     const {
@@ -23,8 +22,12 @@ function NewHomePage() {
         handleTeacherSelect,
         handleCasualSelect,
         setSelectedDates,
+        currentDateIndex,
+        handlePreviousDate,
+        handleNextDate,
         handleGenerateSpreadsheet,
-        setSpreadsheetData
+        setSpreadsheetData,
+        termInfo
     } = useScheduleData();
 
     const { allTeachers, allCasuals } = useTeacherAndCasualLists(isLoading);
@@ -46,7 +49,14 @@ function NewHomePage() {
                     onDateChange={setSelectedDates}
                 />
 
-                <ScheduleDisplayCard schedule={schedule} />
+                <ScheduleDisplayCard
+                    schedule={schedule}
+                    selectedDates={selectedDates}
+                    currentDateIndex={currentDateIndex}
+                    onPreviousDate={handlePreviousDate}
+                    onNextDate={handleNextDate}
+                    termInfo={termInfo}
+                />
 
                 <AssignCasualCard
                     allCasuals={allCasuals}

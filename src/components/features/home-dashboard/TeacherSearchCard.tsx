@@ -33,7 +33,6 @@ export function TeacherSearchCard({
     return (
         <Card className="p-6 mb-8 border">
             <h2 className="text-xl font-semibold mb-4 flex items-center">
-                <span className="bg-primary text-primary-foreground rounded-full h-8 w-8 text-sm flex items-center justify-center mr-3">1</span>
                 Search for Absent Teacher
             </h2>
             
@@ -66,7 +65,7 @@ export function TeacherSearchCard({
                                 >
                                     {selectedDates.length > 0 ? (
                                         selectedDates.length === 1 ? (
-                                            <span>{format(selectedDates[0], "PPP")}</span>
+                                            <span>{format(selectedDates[0], "EEEE dd MMMM yyyy")}</span>
                                         ) : (
                                             <span>{selectedDates.length} date(s) selected</span>
                                         )
@@ -91,7 +90,7 @@ export function TeacherSearchCard({
                             <div className="flex flex-wrap gap-2 mt-2">
                                 {selectedDates.sort((a, b) => a.getTime() - b.getTime()).map((date, index) => (
                                     <div key={index} className="flex items-center bg-muted text-muted-foreground rounded-full pl-3 pr-1 py-1 text-xs">
-                                        <span>{format(date, "dd MMM yy")}</span>
+                                        <span>{format(date, "eee dd MMM")}</span>
                                         <Button
                                             variant="ghost"
                                             size="icon"

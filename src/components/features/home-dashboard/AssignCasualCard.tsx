@@ -24,7 +24,6 @@ export function AssignCasualCard({
     return (
         <Card className="p-6 mb-8 border" id="assign-teacher">
             <h2 className="text-xl font-semibold mb-4 flex items-center">
-                <span className="bg-primary text-primary-foreground rounded-full h-8 w-8 text-sm flex items-center justify-center mr-3">2</span>
                 Assign Replacement Teacher
             </h2>
             
@@ -62,7 +61,7 @@ export function AssignCasualCard({
                     
                     <div className="mt-4">
                         <Button onClick={onGenerateSpreadsheet}>
-                            Print Assignment Details
+                            Load Details
                         </Button>
                     </div>
                 </div>
