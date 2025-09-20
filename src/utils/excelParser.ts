@@ -39,11 +39,16 @@ const parseRFFAndDutySheet = (sheet: XLSX.WorkSheet): { rffSlots: RFFSlot[], dut
     throw new Error('RFF/Duties sheet is missing required headers for RFF or Duty data.');
   }
 
-  dataRows.forEach((row: string[], index: number) => {
+  const parseRowData = (row: string[]): { [key: string]: string } => {
     const rowData: { [key: string]: string } = {};
     headers.forEach((header, i) => {
       rowData[header] = row[i];
     });
+    return rowData;
+  };
+
+  dataRows.forEach((row: string[]) => {
+    const rowData = parseRowData(row);
 
     // Parse RFF Slots
     if (hasRFFHeaders && rowData['RFF ID'] && rowData['Teacher ID'] && rowData['Day'] && rowData['Start Time'] && rowData['End Time'] && rowData['Subject'] && rowData['Covering Teacher']) {

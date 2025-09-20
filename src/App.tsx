@@ -4,7 +4,6 @@ import Navbar from './components/layout/Navbar';
 import SetupPage from './pages/SetupPage';
 import RFFPaybackPage from './pages/RFFPaybackPage';
 import SettingsPage from './pages/SettingsPage';
-import CasualManagerPage from './pages/CasualManagerPage';
 import NewHomePage from './pages/NewHomePage';
 
 function App() {
@@ -16,7 +15,6 @@ function App() {
         <Route path="/setup" element={<SetupPage />} />
         <Route path="/rff-payback" element={<RFFPaybackPage />} />
         <Route path="/settings" element={<SettingsPage />} />
-        <Route path="/casual-manager" element={<CasualManagerPage />} /> {/* Keep old page accessible */}
       </Routes>
     </AppProvider>
   );

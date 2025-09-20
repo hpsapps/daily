@@ -1,11 +1,6 @@
 import { useContext } from 'react';
 import { AppContext } from '../../contexts/AppContext';
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import SummaryCard from './SummaryCard';
 
 const DebtSummaryCards = () => {
   const { state } = useContext(AppContext);
@@ -24,9 +19,11 @@ const DebtSummaryCards = () => {
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Total Hours Owed</CardTitle>
+      <SummaryCard
+        title="Total Hours Owed"
+        value={`${totalHoursOwed.toFixed(1)} hours`}
+        description={`${numberOfActiveDebts} active debts`}
+        icon={
           <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 24 24"
@@ -39,17 +36,13 @@ const DebtSummaryCards = () => {
           >
             <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
           </svg>
-        </CardHeader>
-        <CardContent>
-          <div className="text-2xl font-bold">{totalHoursOwed.toFixed(1)} hours</div>
-          <p className="text-xs text-muted-foreground">
-            {numberOfActiveDebts} active debts
-          </p>
-        </CardContent>
-      </Card>
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Total Cleared Hours</CardTitle>
+        }
+      />
+      <SummaryCard
+        title="Total Cleared Hours"
+        value={`${totalClearedHours.toFixed(1)} hours`}
+        description={`${numberOfClearedDebts} cleared debts`}
+        icon={
           <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 24 24"
@@ -64,14 +57,8 @@ const DebtSummaryCards = () => {
             <circle cx="9" cy="7" r="4" />
             <path d="M22 21v-2a4 4 0 0 0-3-3.87m-4-12a4 4 0 0 1 0 7.75" />
           </svg>
-        </CardHeader>
-        <CardContent>
-          <div className="text-2xl font-bold">{totalClearedHours.toFixed(1)} hours</div>
-          <p className="text-xs text-muted-foreground">
-            {numberOfClearedDebts} cleared debts
-          </p>
-        </CardContent>
-      </Card>
+        }
+      />
       {/* Add more cards for other summaries if needed */}
     </div>
   );

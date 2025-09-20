@@ -1,9 +1,8 @@
-import React from 'react';
 import { Button } from '../../ui/button';
 import { Card } from '../../ui/card';
 import { Label } from '../../ui/label';
 import { TeacherCasualSearch } from '../../custom/TeacherCasualSearch';
-import { Search, CheckCircle } from 'lucide-react';
+import { CheckCircle } from 'lucide-react';
 
 interface AssignCasualCardProps {
     allCasuals: string[];
@@ -29,9 +28,9 @@ export function AssignCasualCard({
                 Assign Replacement Teacher
             </h2>
             
-            <div className="flex flex-col md:flex-row gap-4">
+            <div className="flex flex-col md:flex-row gap-6">
                 <div className="flex-1">
-                    <Label htmlFor="casual-search" className="block text-sm font-medium mb-1">Casual Teacher</Label>
+                    <Label htmlFor="casual-search" className="block text-sm font-medium mb-2">Casual Teacher</Label>
                     <div className="relative">
                         <TeacherCasualSearch
                             id="casual-search"
@@ -41,7 +40,6 @@ export function AssignCasualCard({
                             onValueChange={onCasualSelect}
                             isLoading={isLoading}
                         />
-                        <Search className="absolute right-3 top-2.5 h-4 w-4 text-muted-foreground" />
                     </div>
                 </div>
             </div>
