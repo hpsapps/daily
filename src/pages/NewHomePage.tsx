@@ -1,27 +1,17 @@
 import React, { useState, useContext } from 'react';
 import { AppContext } from '../contexts/AppContext';
 import { Button } from '../components/ui/button';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from "@/components/ui/dialog";
-import { Label } from '../components/ui/label';
-import { Input } from '../components/ui/input';
 import { useScheduleData } from '../hooks/useScheduleData';
 import { useTeacherAndCasualLists } from '../hooks/useTeacherAndCasualLists';
-import { TeacherSearchCard } from '../components/page/home/TeacherSearchCard';
-import { ScheduleDisplayCard } from '../components/page/home/ScheduleDisplayCard';
-import { AssignCasualCard } from '../components/page/home/AssignCasualCard';
-import { AssignmentPreview } from '../components/page/home/AssignmentPreview';
+import { TeacherSearchCard } from '../components/features/home-dashboard/TeacherSearchCard';
+import { ScheduleDisplayCard } from '../components/features/home-dashboard/ScheduleDisplayCard';
+import { AssignCasualCard } from '../components/features/home-dashboard/AssignCasualCard';
+import { AssignmentPreview } from '../components/features/home-dashboard/AssignmentPreview';
+import AddManualDutyDialog from '../components/features/manual-duty/AddManualDutyDialog';
 
 function NewHomePage() {
     const { dispatch } = useContext(AppContext);
     const [isAddDutyModalOpen, setIsAddDutyModalOpen] = useState(false);
-    const [newDutyTimeSlot, setNewDutyTimeSlot] = useState('');
-    const [newDutyLocation, setNewDutyLocation] = useState('');
 
     const {
         selectedTeacher,
@@ -73,57 +63,10 @@ function NewHomePage() {
                 />
             </div>
 
-            <Dialog open={isAddDutyModalOpen} onOpenChange={setIsAddDutyModalOpen}>
-                <DialogContent>
-                    <DialogHeader>
-                        <DialogTitle>Add New Manual Duty</DialogTitle>
-                    </DialogHeader>
-                    <div className="grid gap-4 py-4">
-                        <div className="grid grid-cols-4 items-center gap-4">
-                            <Label htmlFor="timeSlot" className="text-right">
-                                Time Slot
-                            </Label>
-                            <Input
-                                id="timeSlot"
-                                value={newDutyTimeSlot}
-                                onChange={(e) => setNewDutyTimeSlot(e.target.value)}
-                                className="col-span-3"
-                                placeholder="e.g., Recess, Lunch 1"
-                            />
-                        </div>
-                        <div className="grid grid-cols-4 items-center gap-4">
-                            <Label htmlFor="location" className="text-right">
-                                Location
-                            </Label>
-                            <Input
-                                id="location"
-                                value={newDutyLocation}
-                                onChange={(e) => setNewDutyLocation(e.target.value)}
-                                className="col-span-3"
-                                placeholder="e.g., Playground, Library"
-                            />
-                        </div>
-                    </div>
-                    <DialogFooter>
-                        <Button variant="outline" onClick={() => setIsAddDutyModalOpen(false)}>Cancel</Button>
-                        <Button onClick={() => {
-                            if (newDutyTimeSlot && newDutyLocation) {
-                                dispatch({
-                                    type: 'ADD_MANUAL_DUTY',
-                                    payload: {
-                                        timeSlot: newDutyTimeSlot,
-                                        location: newDutyLocation,
-                                        type: 'manual'
-                                    }
-                                });
-                                setNewDutyTimeSlot('');
-                                setNewDutyLocation('');
-                                setIsAddDutyModalOpen(false);
-                            }
-                        }}>Add Duty</Button>
-                    </DialogFooter>
-                </DialogContent>
-            </Dialog>
+            <AddManualDutyDialog
+                isOpen={isAddDutyModalOpen}
+                onOpenChange={setIsAddDutyModalOpen}
+            />
         </div>
     );
 }
