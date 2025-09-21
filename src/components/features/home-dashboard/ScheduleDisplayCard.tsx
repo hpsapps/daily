@@ -1,17 +1,18 @@
 import { useMemo } from 'react';
 import { Card } from '../../ui/card';
-import { getTeacherInfo } from '../../../data/ClassTeacher';
 import { format } from 'date-fns';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '../../ui/button';
+import type { Schedule, ScheduleEntry } from '../../../types'; // Import Schedule and ScheduleEntry types
+import { cn } from '../../../utils/cn'; // Import cn utility
 
 interface ScheduleDisplayCardProps {
-    schedule: any;
+    schedule: Schedule | null; // Schedule can be null
     selectedDates: Date[];
     currentDateIndex: number;
     onPreviousDate: () => void;
     onNextDate: () => void;
-    termInfo: { term?: number; week?: number; type: 'term' | 'holiday' | 'development'; description: string };
+    termInfo?: { term?: number; week?: number; type: 'term' | 'holiday' | 'development'; description: string }; // Make termInfo optional
 }
 
 export function ScheduleDisplayCard({
@@ -22,7 +23,9 @@ export function ScheduleDisplayCard({
     onNextDate,
     termInfo
 }: ScheduleDisplayCardProps) {
-    if (!schedule) return null;
+    if (!schedule) {
+        return null;
+    }
 
     const sortedDates = useMemo(() => {
         return [...selectedDates].sort((a, b) => a.getTime() - b.getTime());
@@ -32,13 +35,22 @@ export function ScheduleDisplayCard({
     const isNextDisabled = currentDateIndex === sortedDates.length - 1;
 
     const currentSelectedDate = sortedDates[currentDateIndex];
-    const isWeekend = currentSelectedDate && (currentSelectedDate.getDay() === 0 || currentSelectedDate.getDay() === 6); // 0 for Sunday, 6 for Saturday
-    const isTermBreak = termInfo.type === 'holiday';
+    // Defensive check for currentSelectedDate
+    if (!currentSelectedDate) {
+        return null;
+    }
+
+    const isWeekend = (currentSelectedDate.getDay() === 0 || currentSelectedDate.getDay() === 6); // 0 for Sunday, 6 for Saturday
+    const isTermBreak = termInfo?.type === 'holiday'; // Use optional chaining for termInfo
+
+    const isRFFSpecialist = schedule.selectedTeacherInfo.role === 'RFF Specialist';
 
     return (
         <Card className="p-6 mb-8 border" id="teacher-results">
             <div className="flex items-center justify-between mb-4">
-                <h2 className="text-xl font-semibold">{schedule.teacher} - {schedule.teacherClass || 'No class assigned'}</h2>
+                <h2 className="text-xl font-semibold">
+                    {schedule.selectedTeacherInfo.name || 'N/A'} - {schedule.selectedTeacherInfo.className || 'No class assigned'}
+                </h2>
                 <span className="text-sm bg-destructive/10 text-destructive px-3 py-1 rounded-full">Absent</span>
             </div>
             <div className="inline-flex items-center mt-2 border rounded-md mb-4">
@@ -51,7 +63,7 @@ export function ScheduleDisplayCard({
                     <ChevronLeft className="h-4 w-4" />
                 </Button>
                 <span className="text-sm px-2 min-w-[6rem] text-center">
-                    {termInfo.type === 'term' && termInfo.term && termInfo.week
+                    {termInfo?.type === 'term' && termInfo.term && termInfo.week
                         ? `${format(currentSelectedDate, "EEE")} W${termInfo.week} T${termInfo.term}`
                         : format(currentSelectedDate, "EEE dd MMM")}
                 </span>
@@ -69,51 +81,70 @@ export function ScheduleDisplayCard({
                 <div className="text-center py-8 text-muted-foreground">
                     <p>
                         {isWeekend
-                            ? `It's the weekend... Hopefully '${schedule.teacher}' is off enjoying themselves.`
-                            : `It's the term break... Hopefully '${schedule.teacher}' is off enjoying themselves.`}
+                            ? `It's the weekend... Hopefully '${schedule.selectedTeacherInfo.name || 'the teacher'}' is off enjoying themselves.`
+                            : `It's the term break... Hopefully '${schedule.selectedTeacherInfo.name || 'the teacher'}' is off enjoying themselves.`}
                     </p>
                 </div>
             ) : (
-                <>
-                    <h4 className="font-semibold mb-2">Duty</h4>
-                    <div id="duties-container" className="space-y-3">
-                        {schedule.duties.length > 0 ? (
-                            schedule.duties.map((duty: any, index: number) => (
-                                <div key={index} className="bg-secondary p-4 rounded-lg">
+                <div className="space-y-3">
+                    {schedule.dailySchedule.length > 0 ? (
+                        schedule.dailySchedule.map((entry: ScheduleEntry, index: number) => {
+                            let timeslotClass = "p-4 rounded-lg";
+                            let badgeText = "";
+                            let badgeClass = "";
+                            let description = entry.description;
+
+                            if (isRFFSpecialist) {
+                                if (entry.type === 'RFF') {
+                                    timeslotClass += " bg-secondary"; // Grey for RFF
+                                    badgeText = "RFF";
+                                    badgeClass = "bg-primary/10 text-primary";
+                                } else {
+                                    timeslotClass += " bg-white border border-gray-300"; // White with grey border for non-RFF
+                                    badgeText = entry.type === 'Class' ? 'Class' : entry.type === 'Duty' ? 'Duty' : entry.type === 'Exec Release' ? 'Exec Release' : 'N/A';
+                                    badgeClass = entry.type === 'Class' ? 'bg-blue-500/10 text-blue-600' : entry.type === 'Duty' ? 'bg-green-500/10 text-green-600' : entry.type === 'Exec Release' ? 'bg-purple-500/10 text-purple-600' : 'bg-gray-500/10 text-gray-600';
+                                }
+                            } else {
+                                // Default styling for non-RFF specialists
+                                if (entry.type === 'Duty') {
+                                    timeslotClass += " bg-secondary";
+                                    badgeText = "Duty";
+                                    badgeClass = "bg-green-500/10 text-green-600";
+                                } else if (entry.type === 'RFF') {
+                                    timeslotClass += " bg-secondary";
+                                    badgeText = "RFF";
+                                    badgeClass = "bg-primary/10 text-primary";
+                                } else if (entry.type === 'Class') {
+                                    timeslotClass += " bg-white border border-gray-300";
+                                    badgeText = "Class";
+                                    badgeClass = "bg-blue-500/10 text-blue-600";
+                                } else if (entry.type === 'Exec Release') {
+                                    timeslotClass += " bg-white border border-gray-300";
+                                    badgeText = "Exec Release";
+                                    badgeClass = "bg-purple-500/10 text-purple-600";
+                                } else {
+                                    timeslotClass += " bg-white border border-gray-300";
+                                    badgeText = "N/A";
+                                    badgeClass = "bg-gray-500/10 text-gray-600";
+                                }
+                            }
+
+                            return (
+                                <div key={index} className={timeslotClass}>
                                     <div className="flex justify-between items-center">
                                         <div>
-                                            <p className="font-medium">{duty.timeSlot}</p>
-                                            <p className="text-sm text-muted-foreground">Location: {duty.area || duty.location}</p>
+                                            <p className="font-medium">{entry.time}</p>
+                                            <p className="text-sm text-muted-foreground">{description}</p>
                                         </div>
-                                        <span className="text-sm bg-green-500/10 text-green-600 px-3 py-1 rounded-full">Duty</span>
+                                        <span className={cn("text-sm px-3 py-1 rounded-full", badgeClass)}>{badgeText}</span>
                                     </div>
                                 </div>
-                            ))
-                        ) : (
-                            <p className="text-muted-foreground">No duties scheduled for this day</p>
-                        )}
-                    </div>
-
-                    <h4 className="font-semibold mb-2 mt-4">RFF Timeslots</h4>
-                    <div className="space-y-3">
-                        {schedule.rffSlots.length > 0 ? (
-                            schedule.rffSlots.map((rff: any, index: number) => (
-                                <div key={index} className="bg-secondary p-4 rounded-lg">
-                                    <div className="flex justify-between items-center">
-                                        <div>
-                                            <p className="font-medium">{rff.timeSlot}</p>
-                                            <p className="text-sm text-muted-foreground">Class: {rff.class} - {rff.activity.replace('RFF: ', '')} ({getTeacherInfo(rff.teacher)?.teacher})</p>
-                                        </div>
-                                        <span className="text-sm bg-primary/10 text-primary px-3 py-1 rounded-full">RFF</span>
-                                    </div>
-                                </div>
-                            ))
-                        ) : (
-                            <p className="text-muted-foreground">No RFF slots found for this teacher on the selected day.</p>
-                        )}
-                    </div>
-
-                </>
+                            );
+                        })
+                    ) : (
+                        <p className="text-muted-foreground">No schedule found for this teacher on the selected day.</p>
+                    )}
+                </div>
             )}
         </Card>
     );

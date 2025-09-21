@@ -1,5 +1,6 @@
 import { createContext, useReducer, type ReactNode, useEffect } from 'react';
-import type { AppState, Teacher, TeacherClassMap, RFFSlot, DutySlot, RFFDebt, CasualTeacher, DutyAssignment } from '../types';
+import type { AppState, Teacher, DutySlot, RFFDebt, CasualTeacher, DutyAssignment } from '../types';
+import type { RFFRosterEntry } from '../utils/excelParser';
 import { storage } from '../utils/storage';
 
 type AppAction =
@@ -13,7 +14,8 @@ type AppAction =
   | { type: 'ADD_ABSENT_TEACHER'; payload: string }
   | { type: 'REMOVE_ABSENT_TEACHER'; payload: string }
   | { type: 'ADD_MANUAL_DUTY'; payload: DutyAssignment }
-  | { type: 'DELETE_MANUAL_DUTY'; payload: number };
+  | { type: 'DELETE_MANUAL_DUTY'; payload: number }
+  | { type: 'LOAD_RFF_ROSTER'; payload: { rffRoster: RFFRosterEntry[]; teachers: Teacher[]; dutySlots: DutySlot[]; } };
 
 const APP_STORAGE_KEY = 'dailyChangesAppState';
 
@@ -23,19 +25,8 @@ const initialState: AppState = {
     { id: 'T002', name: 'Bob Johnson', className: 'Year 6' },
     { id: 'T003', name: 'Charlie Brown', className: 'Year 4' },
   ],
-  teacherClassMap: [
-    { teacherId: 'T001', className: 'Year 5' },
-    { teacherId: 'T002', className: 'Year 6' },
-    { teacherId: 'T003', className: 'Year 4' },
-  ],
-  rffSlots: [
-    { id: 'RFF001', teacherId: 'T001', day: 'Monday', startTime: '09:00', endTime: '10:00', subject: 'Math', coveringTeacher: 'David Lee' },
-    { id: 'RFF002', teacherId: 'T002', day: 'Tuesday', startTime: '11:00', endTime: '12:00', subject: 'English', coveringTeacher: 'Eve Davis' },
-  ],
-  dutySlots: [
-    { id: 'D001', teacherId: 'T001', day: 'Monday', timeSlot: 'Recess', area: 'Playground' },
-    { id: 'D002', teacherId: 'T002', day: 'Tuesday', timeSlot: 'Lunch 1', area: 'Canteen' },
-  ],
+  rffSlots: [], // No longer static
+  dutySlots: [], // No longer static, will be loaded dynamically
   manualDuties: [],
   rffDebts: [
     { id: 'DEBT001', teacherId: 'T001', hoursOwed: 2.5, reason: 'Covering for sick leave', dateCreated: new Date('2025-08-20T09:00:00Z') },
@@ -48,6 +39,7 @@ const initialState: AppState = {
   absentTeachers: [],
   assignments: [],
   casualInstructions: [],
+  rffRoster: [], // Initialize new RFF Roster data
   lastDataUpdate: new Date(),
   isLoading: false,
   error: null,
@@ -105,6 +97,16 @@ const appReducer = (state: AppState, action: AppAction): AppState => {
         ...state,
         manualDuties: state.manualDuties.filter((_, index) => index !== action.payload),
       };
+    case 'LOAD_RFF_ROSTER':
+      return {
+        ...state,
+        rffRoster: action.payload.rffRoster,
+        teachers: action.payload.teachers,
+        dutySlots: action.payload.dutySlots, // Update dutySlots
+        lastDataUpdate: new Date(),
+        isLoading: false,
+        error: null,
+      };
     default:
       return state;
   }
@@ -121,6 +123,9 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
         dateCreated: new Date(debt.dateCreated),
         dateCleared: debt.dateCleared ? new Date(debt.dateCleared) : undefined,
       })) || [];
+      storedState.rffRoster = storedState.rffRoster || [];
+      storedState.teachers = storedState.teachers || [];
+      storedState.dutySlots = storedState.dutySlots || []; // Initialize if not present
     }
     return storedState ? { ...init, ...storedState } : init;
   });

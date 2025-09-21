@@ -8,8 +8,7 @@ const Navbar = () => {
           Daily Changes
         </div>
         <div className="space-x-4">
-          <NavLink to="/" className="text-gray-300 hover:text-white">Casual & Absence Manager</NavLink>
-          <NavLink to="/setup" className="text-gray-300 hover:text-white">Setup</NavLink>
+          <NavLink to="/" className="text-gray-300 hover:text-white">Daily Casual</NavLink>
           <NavLink to="/rff-payback" className="text-gray-300 hover:text-white">RFF Payback</NavLink>
           <NavLink to="/settings" className="text-gray-300 hover:text-white">Settings</NavLink>
         </div>

@@ -27,10 +27,11 @@ function NewHomePage() {
         handleNextDate,
         handleGenerateSpreadsheet,
         setSpreadsheetData,
-        termInfo
+        termInfo,
+        allTeachers // Destructure allTeachers from useScheduleData
     } = useScheduleData();
 
-    const { allTeachers, allCasuals } = useTeacherAndCasualLists(isLoading);
+    const { allCasuals } = useTeacherAndCasualLists(); // Removed isLoading prop
 
     return (
         <div className="bg-secondary min-h-screen">
@@ -41,7 +42,7 @@ function NewHomePage() {
                 </header>
 
                 <TeacherSearchCard
-                    allTeachers={allTeachers}
+                    allTeachers={allTeachers} // Use allTeachers from useScheduleData
                     selectedTeacher={selectedTeacher}
                     selectedDates={selectedDates}
                     isLoading={isLoading}

@@ -7,9 +7,11 @@ import { Popover, PopoverContent, PopoverTrigger } from '../../ui/popover';
 import { Calendar } from '../../ui/calendar';
 import { format } from 'date-fns';
 import { cn } from '../../../utils/cn';
+import { termPeriods } from '../../../utils/termCalculator'; // Import termPeriods
+import type { Teacher } from '../../../types'; // Import Teacher type
 
 interface TeacherSearchCardProps {
-    allTeachers: string[];
+    allTeachers: Teacher[];
     selectedTeacher: string;
     selectedDates: Date[];
     isLoading: boolean;
@@ -43,7 +45,7 @@ export function TeacherSearchCard({
                         <TeacherCasualSearch
                             id="teacher-search"
                             placeholder="Start typing teacher name..."
-                            items={allTeachers}
+                            items={allTeachers.map(t => t.name)} // Pass only names to TeacherCasualSearch
                             selectedValue={selectedTeacher}
                             onValueChange={onTeacherSelect}
                             isLoading={isLoading}
@@ -83,6 +85,7 @@ export function TeacherSearchCard({
                                     numberOfMonths={1}
                                     initialFocus
                                     className="rounded-lg border shadow-sm"
+                                    termPeriods={termPeriods} // Pass termPeriods to Calendar
                                 />
                             </PopoverContent>
                         </Popover>

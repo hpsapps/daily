@@ -1,6 +1,6 @@
-import { parse, isWithinInterval, addWeeks, startOfWeek, endOfWeek, isSameDay } from 'date-fns';
+import { parse, isWithinInterval } from 'date-fns';
 
-interface TermPeriod {
+export interface TermPeriod {
     startDate: Date;
     endDate: Date;
     type: 'term' | 'holiday' | 'development';
@@ -10,7 +10,7 @@ interface TermPeriod {
 }
 
 // Manually parsed and structured term data from the provided CSV
-const termPeriods: TermPeriod[] = [
+export const termPeriods: TermPeriod[] = [
     // Term 1
     { startDate: parse('31/01/2025', 'dd/MM/yyyy', new Date()), endDate: parse('31/01/2025', 'dd/MM/yyyy', new Date()), type: 'development', description: 'School development day (Eastern division)' },
     { startDate: parse('3/02/2025', 'dd/MM/yyyy', new Date()), endDate: parse('7/02/2025', 'dd/MM/yyyy', new Date()), type: 'term', term: 1, week: 2, description: 'Term 1 Week 2 (11 Wk Term)' }, // Assuming Week 1 is 31/01/2025
