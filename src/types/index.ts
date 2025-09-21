@@ -3,12 +3,9 @@ export interface Teacher {
   name: string;
   className?: string;
   email?: string;
+  role?: string; // Added role property
 }
 
-export interface TeacherClassMap {
-  teacherId: string;
-  className: string;
-}
 
 export interface RFFSlot {
   id: string;
@@ -75,15 +72,38 @@ export interface RFFAssignment {
   instruction: string;
 }
 
+import type { RFFRosterEntry } from '../utils/excelParser';
+
+
 export interface DutyAssignment {
   timeSlot: string;
   location: string;
   type: 'inherited' | 'manual';
 }
 
+export interface ScheduleEntry {
+  time: string;
+  type: 'RFF' | 'Class' | 'Duty' | 'N/A' | 'Exec Release';
+  description: string;
+  class?: string;
+  location?: string;
+  teacherName?: string; // The teacher assigned to this slot
+}
+
+export interface Schedule {
+  selectedTeacherInfo: Teacher;
+  date: string;
+  day: string;
+  formattedDate: string;
+  duties: DutyAssignment[];
+  rffSlots: RFFRosterEntry[];
+  assignedCasual: string;
+  termInfo: { term?: number; week?: number; type: 'term' | 'holiday' | 'development'; description: string };
+  dailySchedule: ScheduleEntry[]; // Comprehensive daily schedule
+}
+
 export interface AppState {
   teachers: Teacher[];
-  teacherClassMap: TeacherClassMap[];
   rffSlots: RFFSlot[];
   dutySlots: DutySlot[];
   manualDuties: DutyAssignment[];
@@ -92,6 +112,7 @@ export interface AppState {
   absentTeachers: string[];
   assignments: Assignment[];
   casualInstructions: CasualInstructions[];
+  rffRoster: RFFRosterEntry[]; // New RFF Roster data
   lastDataUpdate: Date;
   isLoading: boolean;
   error: string | null;

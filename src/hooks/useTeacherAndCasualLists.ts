@@ -1,11 +1,15 @@
-import { useMemo } from 'react';
-import { getTeachersByRole, supportStaff } from '../data/ClassTeacher';
+import { useMemo, useContext } from 'react';
+import { AppContext } from '../contexts/AppContext';
+import { supportStaff } from '../data/ClassTeacher'; // Keep supportStaff for casuals
 
-export function useTeacherAndCasualLists(isLoading: boolean) {
+export function useTeacherAndCasualLists() { // Removed isLoading prop
+  const { state } = useContext(AppContext);
+  const { teachers } = state;
+
   const allTeachers = useMemo(() => {
-    if (isLoading) return [];
-    return getTeachersByRole('all').sort();
-  }, [isLoading]);
+    // Use dynamic teachers from AppContext
+    return teachers.map(teacher => teacher.name).sort();
+  }, [teachers]); // Depend on teachers from AppContext
 
   const allCasuals = useMemo(() => {
     return supportStaff.filter(staff => staff.role === 'Casual/Relief').map(staff => staff.teacher).sort();

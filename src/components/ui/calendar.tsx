@@ -4,10 +4,30 @@ import {
   ChevronLeftIcon,
   ChevronRightIcon,
 } from "lucide-react"
-import { DayButton, DayPicker, getDefaultClassNames } from "react-day-picker"
+import { DayButton, DayPicker, getDefaultClassNames, type SelectMultipleEventHandler, type DayPickerProps } from "react-day-picker"
 
-import { cn } from "@/utils/cn"
+import { cn } from "../../utils/cn"
 import { Button, buttonVariants } from "@/components/ui/button"
+import { isWithinInterval } from 'date-fns';
+import type { TermPeriod } from '../../utils/termCalculator';
+
+// Define the props for the Calendar component
+interface CalendarProps {
+  className?: string;
+  classNames?: DayPickerProps['classNames'];
+  showOutsideDays?: boolean;
+  captionLayout?: DayPickerProps['captionLayout'];
+  buttonVariant?: React.ComponentProps<typeof Button>["variant"];
+  formatters?: DayPickerProps['formatters'];
+  components?: DayPickerProps['components'];
+  termPeriods?: TermPeriod[];
+  mode?: "single" | "multiple" | "range";
+  onSelect?: SelectMultipleEventHandler;
+  selected?: Date[];
+  disabled?: DayPickerProps['disabled'];
+  numberOfMonths?: number;
+  initialFocus?: boolean;
+}
 
 function Calendar({
   className,
@@ -17,14 +37,26 @@ function Calendar({
   buttonVariant = "ghost",
   formatters,
   components,
+  termPeriods,
+  mode,
+  onSelect,
+  selected,
+  disabled,
+  numberOfMonths,
+  initialFocus,
   ...props
-}: React.ComponentProps<typeof DayPicker> & {
-  buttonVariant?: React.ComponentProps<typeof Button>["variant"]
-}) {
+}: CalendarProps) {
   const defaultClassNames = getDefaultClassNames()
 
   return (
     <DayPicker
+      mode={mode}
+      // @ts-ignore
+      onSelect={onSelect}
+      // @ts-ignore
+      selected={selected}
+      numberOfMonths={numberOfMonths}
+      initialFocus={initialFocus}
       showOutsideDays={showOutsideDays}
       className={cn(
         "bg-background group/calendar p-3 [--cell-size:2rem] [[data-slot=card-content]_&]:bg-transparent [[data-slot=popover-content]_&]:bg-transparent",
@@ -119,8 +151,12 @@ function Calendar({
           "text-muted-foreground opacity-50",
           defaultClassNames.disabled
         ),
-        hidden: cn("invisible", defaultClassNames.hidden),
-        ...classNames,
+      }}
+      disabled={(date: Date) => {
+        const isWeekend = date.getDay() === 0 || date.getDay() === 6;
+        const isHoliday = termPeriods?.some(p => p.type === 'holiday' && isWithinInterval(date, { start: p.startDate, end: p.endDate })) || false;
+        const externalDisabled = typeof disabled === 'function' ? disabled(date) : false;
+        return isWeekend || isHoliday || externalDisabled;
       }}
       components={{
         Root: ({ className, rootRef, ...props }) => {
@@ -153,7 +189,9 @@ function Calendar({
             <ChevronDownIcon className={cn("size-4", className)} {...props} />
           )
         },
-        DayButton: CalendarDayButton,
+        DayButton: (dayButtonProps) => (
+          <CalendarDayButton {...dayButtonProps} termPeriods={termPeriods} />
+        ),
         WeekNumber: ({ children, ...props }) => {
           return (
             <td {...props}>
@@ -170,18 +208,34 @@ function Calendar({
   )
 }
 
+interface CalendarDayButtonProps extends React.ComponentProps<typeof DayButton> {
+  termPeriods?: TermPeriod[]; // Add termPeriods prop to DayButton
+}
+
 function CalendarDayButton({
   className,
   day,
   modifiers,
+  termPeriods, // Destructure termPeriods
   ...props
-}: React.ComponentProps<typeof DayButton>) {
+}: CalendarDayButtonProps) {
   const defaultClassNames = getDefaultClassNames()
 
   const ref = React.useRef<HTMLButtonElement>(null)
   React.useEffect(() => {
     if (modifiers.focused) ref.current?.focus()
   }, [modifiers.focused])
+
+  const currentPeriod = termPeriods?.find(p => isWithinInterval(day.date, { start: p.startDate, end: p.endDate }));
+  const isHoliday = currentPeriod?.type === 'holiday';
+  const isDevelopmentDay = currentPeriod?.type === 'development';
+
+  let titleText = '';
+  if (isHoliday) {
+    titleText = 'Term Break';
+  } else if (isDevelopmentDay) {
+    titleText = 'SDD';
+  }
 
   return (
     <Button
@@ -201,8 +255,15 @@ function CalendarDayButton({
       className={cn(
         "data-[selected-single=true]:bg-primary data-[selected-single=true]:text-primary-foreground data-[range-middle=true]:bg-accent data-[range-middle=true]:text-accent-foreground data-[range-start=true]:bg-primary data-[range-start=true]:text-primary-foreground data-[range-end=true]:bg-primary data-[range-end=true]:text-primary-foreground group-data-[focused=true]/day:border-ring group-data-[focused=true]/day:ring-ring/50 flex aspect-square h-auto w-full min-w-[--cell-size] flex-col gap-1 font-normal leading-none data-[range-end=true]:rounded-md data-[range-middle=true]:rounded-none data-[range-start=true]:rounded-md group-data-[focused=true]/day:relative group-data-[focused=true]/day:z-10 group-data-[focused=true]/day:ring-[3px] [&>span]:text-xs [&>span]:opacity-70",
         defaultClassNames.day,
-        className
+        className,
+        isHoliday && 'bg-red-100 text-red-800 opacity-50 cursor-not-allowed',
+        isDevelopmentDay && 'bg-blue-100 text-blue-800'
       )}
+      disabled={
+        props.disabled || // Keep existing disabled logic
+        isHoliday // Disable holidays
+      }
+      title={titleText} // Add hover text
       {...props}
     />
   )
