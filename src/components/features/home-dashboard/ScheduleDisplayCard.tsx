@@ -94,39 +94,26 @@ export function ScheduleDisplayCard({
                             let badgeClass = "";
                             let description = entry.description;
 
-                            if (isRFFSpecialist) {
-                                if (entry.type === 'RFF') {
-                                    timeslotClass += " bg-secondary"; // Grey for RFF
-                                    badgeText = "RFF";
-                                    badgeClass = "bg-primary/10 text-primary";
-                                } else {
-                                    timeslotClass += " bg-white border border-gray-300"; // White with grey border for non-RFF
-                                    badgeText = entry.type === 'Class' ? 'Class' : entry.type === 'Duty' ? 'Duty' : entry.type === 'Exec Release' ? 'Exec Release' : 'N/A';
-                                    badgeClass = entry.type === 'Class' ? 'bg-blue-500/10 text-blue-600' : entry.type === 'Duty' ? 'bg-green-500/10 text-green-600' : entry.type === 'Exec Release' ? 'bg-purple-500/10 text-purple-600' : 'bg-gray-500/10 text-gray-600';
-                                }
+                            if (entry.type === 'RFF') {
+                                timeslotClass += " bg-primary/5 border border-primary"; // Soft primary background, primary border
+                                badgeText = "RFF";
+                                badgeClass = "bg-primary/10 text-primary";
+                            } else if (entry.type === 'Duty') {
+                                timeslotClass += " bg-green-50/50 border border-green-600"; // Very soft green background, green border
+                                badgeText = "Duty";
+                                badgeClass = "bg-green-500/10 text-green-600";
+                            } else if (entry.type === 'Class') {
+                                timeslotClass += " bg-white border border-gray-300";
+                                badgeText = "Class";
+                                badgeClass = "bg-blue-500/10 text-blue-600";
+                            } else if (entry.type === 'Exec Release') {
+                                timeslotClass += " bg-white border border-gray-300";
+                                badgeText = "Exec Release";
+                                badgeClass = "bg-purple-500/10 text-purple-600";
                             } else {
-                                // Default styling for non-RFF specialists
-                                if (entry.type === 'Duty') {
-                                    timeslotClass += " bg-secondary";
-                                    badgeText = "Duty";
-                                    badgeClass = "bg-green-500/10 text-green-600";
-                                } else if (entry.type === 'RFF') {
-                                    timeslotClass += " bg-secondary";
-                                    badgeText = "RFF";
-                                    badgeClass = "bg-primary/10 text-primary";
-                                } else if (entry.type === 'Class') {
-                                    timeslotClass += " bg-white border border-gray-300";
-                                    badgeText = "Class";
-                                    badgeClass = "bg-blue-500/10 text-blue-600";
-                                } else if (entry.type === 'Exec Release') {
-                                    timeslotClass += " bg-white border border-gray-300";
-                                    badgeText = "Exec Release";
-                                    badgeClass = "bg-purple-500/10 text-purple-600";
-                                } else {
-                                    timeslotClass += " bg-white border border-gray-300";
-                                    badgeText = "N/A";
-                                    badgeClass = "bg-gray-500/10 text-gray-600";
-                                }
+                                timeslotClass += " bg-white border border-gray-300";
+                                badgeText = "N/A";
+                                badgeClass = "bg-gray-500/10 text-gray-600";
                             }
 
                             return (
