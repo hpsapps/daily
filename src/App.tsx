@@ -3,14 +3,14 @@ import { AppProvider } from './contexts/AppContext';
 import Navbar from './components/layout/Navbar';
 import RFFPaybackPage from './pages/RFFPaybackPage';
 import SettingsPage from './pages/SettingsPage';
-import NewHomePage from './pages/NewHomePage';
+import DailyCasualHome from './pages/DailyCasualHome';
 
 function App() {
   return (
     <AppProvider>
       <Navbar />
       <Routes>
-        <Route path="/" element={<NewHomePage />} />
+        <Route path="/" element={<DailyCasualHome />} />
         <Route path="/rff-payback" element={<RFFPaybackPage />} />
         <Route path="/settings" element={<SettingsPage />} />
       </Routes>
