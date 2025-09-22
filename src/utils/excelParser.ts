@@ -9,25 +9,6 @@ export interface RFFRosterEntry {
   class: string;
 }
 
-// Helper to extract unique teachers from RFF and Duty slots
-const extractTeachers = (rffSlots: RFFSlot[], dutySlots: DutySlot[]): Teacher[] => {
-  const teacherMap = new Map<string, Teacher>();
-
-  rffSlots.forEach(slot => {
-    if (!teacherMap.has(slot.teacherId)) {
-      teacherMap.set(slot.teacherId, { id: slot.teacherId, name: slot.coveringTeacher }); // Assuming coveringTeacher is the teacher's name
-    }
-  });
-
-  dutySlots.forEach(slot => {
-    if (!teacherMap.has(slot.teacherId)) {
-      teacherMap.set(slot.teacherId, { id: slot.teacherId, name: `Teacher ${slot.teacherId}` }); // Placeholder name
-    }
-  });
-
-  return Array.from(teacherMap.values());
-};
-
 const parseTeachersFromSummary = (summarySheet: ExcelJS.Worksheet): Teacher[] => {
   const teachersMap = new Map<string, Teacher>();
 
@@ -71,8 +52,9 @@ const parseDutyRosterSheet = (dutyRosterSheet: ExcelJS.Worksheet): DutySlot[] =>
     const dutyType = row.getCell(headers['Duty'])?.text;
     const timeSlot = row.getCell(headers['Time'])?.text;
     const area = row.getCell(headers['Area'])?.text;
+    const when = row.getCell(1)?.text;
 
-    if (dutyType && timeSlot && area) {
+    if (dutyType && timeSlot && area && when) {
       // Normalize timeSlot: replace dots with colons, remove am/pm, trim spaces
       const normalizedTimeSlot = timeSlot
         .replace(/\./g, ':') // Replace dots with colons
@@ -89,6 +71,7 @@ const parseDutyRosterSheet = (dutyRosterSheet: ExcelJS.Worksheet): DutySlot[] =>
             day: day,
             timeSlot: normalizedTimeSlot,
             area: area,
+            when: when, // Add the 'when' field
           });
         }
       });
@@ -122,7 +105,7 @@ const parseRFFRosterSheet = (summarySheet: ExcelJS.Worksheet, allDaysSheet: Exce
   let rffTeachers: string[] = [];
   let rffClasses: string[] = [];
 
-  allDaysSheet.eachRow((row, rowIndex) => {
+  allDaysSheet.eachRow((row) => {
     const firstCellText = row.getCell(1).text;
 
     // Identify Day

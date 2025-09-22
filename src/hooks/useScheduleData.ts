@@ -1,7 +1,7 @@
 import { useState, useEffect, useContext, useMemo } from 'react';
 import { AppContext } from '../contexts/AppContext';
 import { getTermAndWeek } from '../utils/termCalculator';
-import type { DutyAssignment, Teacher, Schedule, ScheduleEntry } from '../types';
+import type { DutyAssignment, Schedule, ScheduleEntry } from '../types';
 import type { RFFRosterEntry } from '../utils/excelParser';
 import { addDays } from 'date-fns';
 
@@ -94,7 +94,8 @@ export function useScheduleData() {
         ).map(duty => ({
             timeSlot: duty.timeSlot,
             location: duty.area, // Map area to location
-            type: 'inherited' as 'inherited' // Cast to DutyAssignment type
+            type: 'inherited' as 'inherited', // Cast to DutyAssignment type
+            when: duty.when, // Include the 'when' property
         }));
         const duties: DutyAssignment[] = [...inheritedDuties, ...manualDuties];
 
@@ -165,7 +166,7 @@ export function useScheduleData() {
                 return {
                     time: timeSlot,
                     type: 'Duty',
-                    description: `Duty at ${dutyAssignment.location}`,
+                    description: `${dutyAssignment.when} at ${dutyAssignment.location}`,
                     location: dutyAssignment.location,
                     teacherName: currentTeacherInfo?.name,
                     class: undefined, // Explicitly set to undefined

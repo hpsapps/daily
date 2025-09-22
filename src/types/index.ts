@@ -3,7 +3,7 @@ export interface Teacher {
   name: string;
   className?: string;
   email?: string;
-  role?: string; // Added role property
+  role?: string;
 }
 
 
@@ -24,6 +24,7 @@ export interface DutySlot {
   day: string;
   timeSlot: string;
   area: string;
+  when: string;
 }
 
 export interface RFFDebt {
@@ -79,6 +80,7 @@ export interface DutyAssignment {
   timeSlot: string;
   location: string;
   type: 'inherited' | 'manual';
+  when: string;
 }
 
 export interface ScheduleEntry {
@@ -87,7 +89,7 @@ export interface ScheduleEntry {
   description: string;
   class?: string;
   location?: string;
-  teacherName?: string; // The teacher assigned to this slot
+  teacherName?: string;
 }
 
 export interface Schedule {
@@ -99,7 +101,7 @@ export interface Schedule {
   rffSlots: RFFRosterEntry[];
   assignedCasual: string;
   termInfo: { term?: number; week?: number; type: 'term' | 'holiday' | 'development'; description: string };
-  dailySchedule: ScheduleEntry[]; // Comprehensive daily schedule
+  dailySchedule: ScheduleEntry[];
 }
 
 export interface AppState {
@@ -112,7 +114,7 @@ export interface AppState {
   absentTeachers: string[];
   assignments: Assignment[];
   casualInstructions: CasualInstructions[];
-  rffRoster: RFFRosterEntry[]; // New RFF Roster data
+  rffRoster: RFFRosterEntry[];
   lastDataUpdate: Date;
   isLoading: boolean;
   error: string | null;

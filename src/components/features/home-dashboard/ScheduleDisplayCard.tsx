@@ -43,8 +43,6 @@ export function ScheduleDisplayCard({
     const isWeekend = (currentSelectedDate.getDay() === 0 || currentSelectedDate.getDay() === 6); // 0 for Sunday, 6 for Saturday
     const isTermBreak = termInfo?.type === 'holiday'; // Use optional chaining for termInfo
 
-    const isRFFSpecialist = schedule.selectedTeacherInfo.role === 'RFF Specialist';
-
     return (
         <Card className="p-6 mb-8 border" id="teacher-results">
             <div className="flex items-center justify-between mb-4">
