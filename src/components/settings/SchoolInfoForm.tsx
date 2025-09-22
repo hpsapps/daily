@@ -1,17 +1,34 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 
-const SchoolInfoForm = () => {
+interface SchoolInfoFormProps {
+  onSave: () => void;
+}
+
+const SchoolInfoForm = ({ onSave }: SchoolInfoFormProps) => {
   const [schoolName, setSchoolName] = useState('');
   const [schoolAddress, setSchoolAddress] = useState('');
   const [schoolPhone, setSchoolPhone] = useState('');
+  const [schoolEmail, setSchoolEmail] = useState('');
+
+  useEffect(() => {
+    const savedSchoolInfo = localStorage.getItem('schoolInfo');
+    if (savedSchoolInfo) {
+      const { name, address, phone, email } = JSON.parse(savedSchoolInfo);
+      setSchoolName(name || '');
+      setSchoolAddress(address || '');
+      setSchoolPhone(phone || '');
+      setSchoolEmail(email || '');
+    }
+  }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('School Info Saved:', { schoolName, schoolAddress, schoolPhone });
-    // Here you would typically dispatch an action to save this to global state or localStorage
+    const schoolInfo = { name: schoolName, address: schoolAddress, phone: schoolPhone, email: schoolEmail };
+    localStorage.setItem('schoolInfo', JSON.stringify(schoolInfo));
+    onSave();
   };
 
   return (
@@ -34,6 +51,16 @@ const SchoolInfoForm = () => {
           value={schoolAddress}
           onChange={(e) => setSchoolAddress(e.target.value)}
           placeholder="e.g., 123 School Lane"
+        />
+      </div>
+      <div>
+        <Label htmlFor="schoolEmail">Email</Label>
+        <Input
+          id="schoolEmail"
+          type="email"
+          value={schoolEmail}
+          onChange={(e) => setSchoolEmail(e.target.value)}
+          placeholder="e.g., info@happyvalley.edu"
         />
       </div>
       <div>
