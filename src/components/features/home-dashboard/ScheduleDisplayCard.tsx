@@ -1,5 +1,4 @@
 import { useMemo } from 'react';
-import { Card } from '../../ui/card';
 import { format } from 'date-fns';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '../../ui/button';
@@ -44,7 +43,7 @@ export function ScheduleDisplayCard({
     const isTermBreak = termInfo?.type === 'holiday'; // Use optional chaining for termInfo
 
     return (
-        <Card className="p-6 mb-8 border" id="teacher-results">
+        <div className='p-4 mb-8' id="schedule-display-card">
             <div className="flex items-center justify-between mb-4">
                 <h2 className="text-xl font-semibold">
                     {schedule.selectedTeacherInfo.name || 'N/A'} - {schedule.selectedTeacherInfo.className || 'No class assigned'}
@@ -131,6 +130,6 @@ export function ScheduleDisplayCard({
                     )}
                 </div>
             )}
-        </Card>
+        </div>
     );
 }

@@ -1,22 +1,22 @@
 import { useState } from 'react'; // Import useState
-import { Card } from '../../ui/card';
 import { Button } from '../../ui/button';
 import { Construction } from 'lucide-react';
 
 interface AssignmentPreviewProps {
     spreadsheetData: string;
     onSpreadsheetDataChange: (data: string) => void;
+    selectedCasual: string | null;
 }
 
-export function AssignmentPreview({ spreadsheetData, onSpreadsheetDataChange }: AssignmentPreviewProps) {
+export function AssignmentPreview({ spreadsheetData, onSpreadsheetDataChange, selectedCasual }: AssignmentPreviewProps) {
     const [showMessage, setShowMessage] = useState(false);
 
     if (!spreadsheetData) return null;
 
     return (
-        <Card className="p-6 border">
+        <div className='p-4 mb-8' id="assignment-preview">
             <h2 className="text-xl font-semibold mb-4 flex items-center">
-                Spreadsheet Preview
+                {selectedCasual ? `Preview Day for ${selectedCasual}` : 'Spreadsheet Preview'}
             </h2>
             <textarea
                 className="w-full h-64 p-3 border rounded-md resize-y bg-secondary"
@@ -43,6 +43,6 @@ export function AssignmentPreview({ spreadsheetData, onSpreadsheetDataChange }: 
                     </div>
                 </div>
             )}
-        </Card>
+        </div>
     );
 }

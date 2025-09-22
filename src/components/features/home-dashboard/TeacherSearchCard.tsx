@@ -1,5 +1,4 @@
 import { Button } from '../../ui/button';
-import { Card } from '../../ui/card';
 import { Label } from '../../ui/label';
 import { TeacherCasualSearch } from '../../custom/TeacherCasualSearch';
 import { X } from 'lucide-react';
@@ -33,7 +32,7 @@ export function TeacherSearchCard({
     };
 
     return (
-        <Card className="p-6 mb-8 border">
+        <div className='p-4 mb-8' id="teacher-search-card">
             <h2 className="text-xl font-semibold mb-4 flex items-center">
                 Search for Absent Teacher
             </h2>
@@ -109,6 +108,6 @@ export function TeacherSearchCard({
                     </div>
                 </div>
             </div>
-        </Card>
+        </div>
     );
 }

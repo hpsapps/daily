@@ -1,5 +1,4 @@
 import { Button } from '../../ui/button';
-import { Card } from '../../ui/card';
 import { Label } from '../../ui/label';
 import { TeacherCasualSearch } from '../../custom/TeacherCasualSearch';
 import { CheckCircle } from 'lucide-react';
@@ -22,7 +21,7 @@ export function AssignCasualCard({
     onGenerateSpreadsheet
 }: AssignCasualCardProps) {
     return (
-        <Card className="p-6 mb-8 border" id="assign-teacher">
+        <div className='p-4 mb-8' id="assign-casual-card">
             <h2 className="text-xl font-semibold mb-4 flex items-center">
                 Assign Replacement Teacher
             </h2>
@@ -51,10 +50,7 @@ export function AssignCasualCard({
                                 <CheckCircle className="h-5 w-5 text-green-500" />
                             </div>
                             <div className="ml-3">
-                                <h3 className="text-sm font-medium text-green-700">Assignment Complete</h3>
-                                <div className="mt-2 text-sm text-green-600">
-                                    <p>{selectedCasual} has been assigned to cover {selectedTeacher}'s classes and duties.</p>
-                                </div>
+                                    <p className="text-sm text-green-600">{selectedCasual} has been assigned to cover {selectedTeacher}.</p>
                             </div>
                         </div>
                     </div>
@@ -66,6 +62,6 @@ export function AssignCasualCard({
                     </div>
                 </div>
             )}
-        </Card>
+        </div>
     );
 }
