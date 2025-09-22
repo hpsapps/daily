@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import * as XLSX from 'xlsx';
+import * as ExcelJS from 'exceljs';
 import { useContext } from 'react';
 import { AppContext } from '../../contexts/AppContext';
 
@@ -12,12 +12,31 @@ const DataManagement = () => {
   };
 
   const handleExportData = () => {
-    // Example: Exporting teachers data
-    const ws = XLSX.utils.json_to_sheet(state.teachers);
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "Teachers");
-    XLSX.writeFile(wb, "daily_changes_data.xlsx");
-    console.log('Exporting all application data...');
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet("Teachers");
+
+    // Define columns based on Teacher interface
+    worksheet.columns = [
+      { header: 'ID', key: 'id', width: 10 },
+      { header: 'Name', key: 'name', width: 30 },
+      { header: 'Class Name', key: 'className', width: 20 },
+      { header: 'Role', key: 'role', width: 20 },
+    ];
+
+    // Add rows from state.teachers
+    state.teachers.forEach(teacher => {
+      worksheet.addRow(teacher);
+    });
+
+    workbook.xlsx.writeFile("daily_changes_data.xlsx")
+      .then(() => {
+        console.log('Exporting all application data...');
+        alert('Data exported successfully!');
+      })
+      .catch(error => {
+        console.error('Error exporting data:', error);
+        alert('Failed to export data.');
+      });
   };
 
   return (

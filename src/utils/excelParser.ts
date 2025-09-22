@@ -1,4 +1,4 @@
-import * as XLSX from 'xlsx';
+import * as ExcelJS from 'exceljs';
 import type { Teacher, RFFSlot, DutySlot, RFFDebt } from '../types';
 
 export interface RFFRosterEntry {
@@ -28,16 +28,15 @@ const extractTeachers = (rffSlots: RFFSlot[], dutySlots: DutySlot[]): Teacher[] 
   return Array.from(teacherMap.values());
 };
 
-const parseTeachersFromSummary = (summarySheet: XLSX.WorkSheet): Teacher[] => {
-  const summaryJson = XLSX.utils.sheet_to_json(summarySheet, { header: 1 }) as string[][];
+const parseTeachersFromSummary = (summarySheet: ExcelJS.Worksheet): Teacher[] => {
   const teachersMap = new Map<string, Teacher>();
 
-  // Assuming headers are: Teacher Name (Col A), Class (Col B), Class Type (Col C)
-  for (let i = 1; i < summaryJson.length; i++) {
-    const row = summaryJson[i];
-    const teacherName = row[0]?.toString();
-    const className = row[1]?.toString();
-    const classType = row[2]?.toString();
+  summarySheet.eachRow((row, rowNumber) => {
+    if (rowNumber === 1) return; // Skip header row
+
+    const teacherName = row.getCell(1).text;
+    const className = row.getCell(2).text;
+    const classType = row.getCell(3).text;
 
     if (teacherName) {
       const teacher: Teacher = { id: teacherName, name: teacherName };
@@ -51,102 +50,114 @@ const parseTeachersFromSummary = (summarySheet: XLSX.WorkSheet): Teacher[] => {
       }
       teachersMap.set(teacherName, teacher);
     }
-  }
+  });
   return Array.from(teachersMap.values());
 };
 
-// This function is no longer needed as className is now part of the Teacher object
-const parseDutyRosterSheet = (dutyRosterSheet: XLSX.WorkSheet): DutySlot[] => {
-  const json = XLSX.utils.sheet_to_json(dutyRosterSheet, { header: 1 }) as string[][];
-  const headers = json[0]; // Headers: Duty, Time, Area, Monday, Tuesday, ...
+const parseDutyRosterSheet = (dutyRosterSheet: ExcelJS.Worksheet): DutySlot[] => {
   const dutySlots: DutySlot[] = [];
-
   const daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
-  const headerMap: { [key: string]: number } = {};
-  headers.forEach((h, i) => {
-    if (typeof h === 'string') {
-      headerMap[h] = i;
+  const headers: { [key: string]: number } = {};
+
+  dutyRosterSheet.getRow(1).eachCell((cell, colNumber) => {
+    if (typeof cell.value === 'string') {
+      headers[cell.value] = colNumber;
     }
   });
 
-  for (let i = 1; i < json.length; i++) {
-    const row = json[i];
-    const dutyType = row[headerMap['Duty']]?.toString();
-    const timeSlot = row[headerMap['Time']]?.toString();
-    const area = row[headerMap['Area']]?.toString();
+  dutyRosterSheet.eachRow((row, rowNumber) => {
+    if (rowNumber === 1) return; // Skip header row
+
+    const dutyType = row.getCell(headers['Duty'])?.text;
+    const timeSlot = row.getCell(headers['Time'])?.text;
+    const area = row.getCell(headers['Area'])?.text;
 
     if (dutyType && timeSlot && area) {
+      // Normalize timeSlot: replace dots with colons, remove am/pm, trim spaces
+      const normalizedTimeSlot = timeSlot
+        .replace(/\./g, ':') // Replace dots with colons
+        .replace(/\s*am|\s*pm/gi, '') // Remove 'am' or 'pm' (case-insensitive)
+        .replace(/\s-\s/g, '-') // Replace " - " with "-"
+        .trim(); // Trim any remaining whitespace
+
       daysOfWeek.forEach(day => {
-        const teacherName = row[headerMap[day]]?.toString();
+        const teacherName = row.getCell(headers[day])?.text;
         if (teacherName) {
-          // Assuming teacherName can be used as teacherId for now
           dutySlots.push({
-            id: `${day}-${timeSlot}-${area}-${teacherName}`, // Unique ID for each duty slot
-            teacherId: teacherName, // Use teacher name as ID
+            id: `${day}-${normalizedTimeSlot}-${area}-${teacherName}`,
+            teacherId: teacherName,
             day: day,
-            timeSlot: timeSlot,
+            timeSlot: normalizedTimeSlot,
             area: area,
           });
         }
       });
     }
-  }
+  });
   return dutySlots;
 };
 
-const parseRFFRosterSheet = (summarySheet: XLSX.WorkSheet, allDaysSheet: XLSX.WorkSheet): RFFRosterEntry[] => {
-  const summaryJson = XLSX.utils.sheet_to_json(summarySheet, { header: 1 }) as string[][];
-  const allDaysJson = XLSX.utils.sheet_to_json(allDaysSheet, { header: 1 }) as string[][];
-
+const parseRFFRosterSheet = (summarySheet: ExcelJS.Worksheet, allDaysSheet: ExcelJS.Worksheet): RFFRosterEntry[] => {
   const rffTeachersMap = new Map<string, string>(); // RFF Teacher Name -> RFF Class/Subject
   const classTeachersMap = new Map<string, string>(); // Class Taught -> Class Teacher Name
 
   // Parse Summary sheet for RFF Teachers and Class Teachers
-  // Assuming RFF Teacher Name is in column E, RFF Class in column F
-  // Assuming Class Teacher Name is in column A, Class Taught in column B
-  for (let i = 1; i < summaryJson.length; i++) {
-    const row = summaryJson[i];
-    if (row[4] && row[5]) { // RFF Teacher Name and RFF Class
-      rffTeachersMap.set(row[4].toString(), row[5].toString());
+  summarySheet.eachRow((row, rowNumber) => {
+    if (rowNumber === 1) return; // Skip header row
+    const rffTeacherName = row.getCell(5).text; // Column E
+    const rffClass = row.getCell(6).text; // Column F
+    const classTeacherName = row.getCell(1).text; // Column A
+    const classTaught = row.getCell(2).text; // Column B
+
+    if (rffTeacherName && rffClass) {
+      rffTeachersMap.set(rffTeacherName, rffClass);
     }
-    if (row[0] && row[1]) { // Class Teacher Name and Class Taught
-      classTeachersMap.set(row[1].toString(), row[0].toString());
+    if (classTeacherName && classTaught) {
+      classTeachersMap.set(classTaught, classTeacherName);
     }
-  }
+  });
 
   const rffRoster: RFFRosterEntry[] = [];
   let currentDay = '';
   let rffTeachers: string[] = [];
   let rffClasses: string[] = [];
-  const timeSlots: string[] = [];
 
-  allDaysJson.forEach((row, rowIndex) => {
+  allDaysSheet.eachRow((row, rowIndex) => {
+    const firstCellText = row.getCell(1).text;
+
     // Identify Day
-    if (row[0] && ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'].includes(row[0].toString())) {
-      currentDay = row[0].toString();
+    if (['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'].includes(firstCellText)) {
+      currentDay = firstCellText;
       rffTeachers = [];
       rffClasses = [];
-      timeSlots.length = 0; // Clear previous time slots
     } else if (currentDay) {
       // Identify RFF Teachers (row after Day)
-      if (row[0] === 'RFF Teacher') {
-        rffTeachers = row.slice(1).filter(Boolean).map(String);
+      if (firstCellText === 'RFF Teacher') {
+        row.eachCell((cell, colIndex) => {
+          if (colIndex > 1 && cell.text) {
+            rffTeachers.push(cell.text);
+          }
+        });
       }
       // Identify RFF Classes (row after RFF Teacher)
-      else if (row[0] === 'RFF Class') {
-        rffClasses = row.slice(1).filter(Boolean).map(String);
+      else if (firstCellText === 'RFF Class') {
+        row.eachCell((cell, colIndex) => {
+          if (colIndex > 1 && cell.text) {
+            rffClasses.push(cell.text);
+          }
+        });
       }
       // Identify Time Slots and Schedule
-      else if (row[0] && row[0].match(/^\d{1,2}\.\d{2}-\d{1,2}\.\d{2}$/)) { // Regex for time format e.g., 9.10-9.50
-        const time = row[0].toString();
-        row.slice(1).forEach((cell, colIndex) => {
-          if (cell && rffTeachers[colIndex] && rffClasses[colIndex]) {
+      else if (firstCellText.match(/^\d{1,2}([:.])\d{2}-\d{1,2}([:.])\d{2}$/)) { // Regex for time format e.g., 9:10-9:50 or 9.10-9.50
+        const time = firstCellText.replace(/\./g, ':');
+        row.eachCell((cell, colIndex) => {
+          if (colIndex > 1 && cell.text && rffTeachers[colIndex - 2] && rffClasses[colIndex - 2]) {
             rffRoster.push({
               day: currentDay,
               time: time,
-              teacher: rffTeachers[colIndex],
-              subject: rffClasses[colIndex],
-              class: cell.toString(),
+              teacher: rffTeachers[colIndex - 2],
+              subject: rffClasses[colIndex - 2],
+              class: cell.text.trim(), // Trim whitespace
             });
           }
         });
@@ -157,50 +168,37 @@ const parseRFFRosterSheet = (summarySheet: XLSX.WorkSheet, allDaysSheet: XLSX.Wo
   return rffRoster;
 };
 
-export const parseExcelData = (file: File): Promise<{
+export const parseExcelData = async (file: File): Promise<{
   teachers: Teacher[];
   rffSlots: RFFSlot[];
-  dutySlots: DutySlot[]; // Now dynamically parsed
+  dutySlots: DutySlot[];
   rffDebts: RFFDebt[];
   rffRoster: RFFRosterEntry[];
 }> => {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      try {
-        const data = event.target?.result;
-        const workbook = XLSX.read(data, { type: 'array' });
+  const buffer = await file.arrayBuffer();
+  const workbook = new ExcelJS.Workbook();
+  await workbook.xlsx.load(buffer);
 
-        const summarySheet = workbook.Sheets['Summary'];
-        const allDaysSheet = workbook.Sheets['ALL DAYS'];
-        const dutyRosterSheet = workbook.Sheets['Duty Roster']; // New: Get Duty Roster sheet
+  const summarySheet = workbook.getWorksheet('Summary');
+  const allDaysSheet = workbook.getWorksheet('ALL DAYS');
+  const dutyRosterSheet = workbook.getWorksheet('Duty Roster');
 
-        if (!summarySheet || !allDaysSheet || !dutyRosterSheet) {
-          throw new Error('Required sheets (Summary, ALL DAYS, Duty Roster) are missing from the Excel file for Roster parsing.');
-        }
+  if (!summarySheet || !allDaysSheet || !dutyRosterSheet) {
+    throw new Error('Required sheets (Summary, ALL DAYS, Duty Roster) are missing from the Excel file for Roster parsing.');
+  }
 
-        const rffRoster = parseRFFRosterSheet(summarySheet, allDaysSheet);
-        const teachers = parseTeachersFromSummary(summarySheet);
-        const dutySlots = parseDutyRosterSheet(dutyRosterSheet); // New: Parse duty slots
+  const rffRoster = parseRFFRosterSheet(summarySheet, allDaysSheet);
+  const teachers = parseTeachersFromSummary(summarySheet);
+  const dutySlots = parseDutyRosterSheet(dutyRosterSheet);
 
-        // Other data types are not present in this specific RFF Roster upload.
-        const rffSlots: RFFSlot[] = [];
-        const rffDebts: RFFDebt[] = [];
+  const rffSlots: RFFSlot[] = [];
+  const rffDebts: RFFDebt[] = [];
 
-        resolve({
-          teachers,
-          rffSlots,
-          dutySlots, // Include dynamic duty slots
-          rffDebts,
-          rffRoster,
-        });
-      } catch (error) {
-        reject(error);
-      }
-    };
-    reader.onerror = (error) => {
-      reject(error);
-    };
-    reader.readAsArrayBuffer(file);
-  });
+  return {
+    teachers,
+    rffSlots,
+    dutySlots,
+        rffDebts,
+    rffRoster,
+  };
 };
