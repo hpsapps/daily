@@ -1,5 +1,5 @@
 import { createContext, useReducer, type ReactNode, useEffect } from 'react';
-import type { AppState, Teacher, DutySlot, RFFDebt, CasualTeacher, DutyAssignment } from '../types';
+import type { AppState, Teacher, DutySlot, RFFDebt, CasualTeacher, DutyAssignment, ModifiedRff, ScheduleEntry } from '../types';
 import type { RFFRosterEntry } from '../utils/excelParser';
 import { storage } from '../utils/storage';
 
@@ -14,7 +14,12 @@ type AppAction =
   | { type: 'ADD_ABSENT_TEACHER'; payload: string }
   | { type: 'REMOVE_ABSENT_TEACHER'; payload: string }
   | { type: 'ADD_MANUAL_DUTY'; payload: DutyAssignment }
-  | { type: 'DELETE_MANUAL_DUTY'; payload: number }
+  | { type: 'REMOVE_MANUAL_DUTY'; payload: Partial<DutyAssignment> }
+  | { type: 'UPDATE_MANUAL_DUTY'; payload: { original: { id: string; timeSlot: string; location: string; when: string; teacherId?: string; date?: string; }; updated: DutyAssignment } }
+  | { type: 'UPDATE_INHERITED_DUTY'; payload: { original: { dutyId: string; timeSlot: string; teacherId: string; date: string; }; updated: DutyAssignment } }
+  | { type: 'RESET_INHERITED_DUTY'; payload: { dutyId: string; timeSlot: string; teacherId: string; date: string; } } // New action type for resetting inherited duties
+  | { type: 'UPDATE_RFF'; payload: ModifiedRff } // New action type for updating RFFs
+  | { type: 'RESET_RFF'; payload: { id: string; } } // New action type for resetting RFFs, only needs the ID
   | { type: 'LOAD_RFF_ROSTER'; payload: { rffRoster: RFFRosterEntry[]; teachers: Teacher[]; dutySlots: DutySlot[]; } };
 
 const APP_STORAGE_KEY = 'dailyChangesAppState';
@@ -40,6 +45,8 @@ const initialState: AppState = {
   assignments: [],
   casualInstructions: [],
   rffRoster: [], // Initialize new RFF Roster data
+  modifiedInheritedDuties: [], // Initialize new state for modified inherited duties
+  modifiedRffs: [], // Initialize new state for modified RFFs
   lastDataUpdate: new Date(),
   isLoading: false,
   error: null,
@@ -92,10 +99,77 @@ const appReducer = (state: AppState, action: AppAction): AppState => {
         ...state,
         manualDuties: [...state.manualDuties, action.payload],
       };
-    case 'DELETE_MANUAL_DUTY':
+    case 'REMOVE_MANUAL_DUTY':
       return {
         ...state,
-        manualDuties: state.manualDuties.filter((_, index) => index !== action.payload),
+        manualDuties: state.manualDuties.filter(
+          (duty) => duty.id !== action.payload.id
+        ),
+      };
+    case 'UPDATE_MANUAL_DUTY':
+      return {
+        ...state,
+        manualDuties: state.manualDuties.map((duty) =>
+          duty.id === action.payload.original.id
+            ? action.payload.updated
+            : duty
+        ),
+      };
+    case 'UPDATE_INHERITED_DUTY':
+      const existingDutyIndex = state.modifiedInheritedDuties.findIndex(
+        (duty) =>
+          duty.original.dutyId === action.payload.original.dutyId
+      );
+
+      if (existingDutyIndex !== -1) {
+        // Update existing modified duty
+        const updatedModifiedDuties = [...state.modifiedInheritedDuties];
+        updatedModifiedDuties[existingDutyIndex] = action.payload;
+        return {
+          ...state,
+          modifiedInheritedDuties: updatedModifiedDuties,
+        };
+      } else {
+        // Add new modified duty
+        return {
+          ...state,
+          modifiedInheritedDuties: [...state.modifiedInheritedDuties, action.payload],
+        };
+      }
+    case 'RESET_INHERITED_DUTY':
+      return {
+        ...state,
+        modifiedInheritedDuties: state.modifiedInheritedDuties.filter(
+          (duty) =>
+            !(
+              duty.original.dutyId === action.payload.dutyId
+            )
+        ),
+      };
+    case 'UPDATE_RFF':
+      const existingRffIndex = state.modifiedRffs.findIndex(
+        (rff) => rff.original.id === action.payload.original.id
+      );
+
+      if (existingRffIndex !== -1) {
+        const updatedModifiedRffs = [...state.modifiedRffs];
+        updatedModifiedRffs[existingRffIndex] = action.payload;
+        return {
+          ...state,
+          modifiedRffs: updatedModifiedRffs,
+        };
+      } else {
+        return {
+          ...state,
+          modifiedRffs: [...state.modifiedRffs, action.payload],
+        };
+      }
+    case 'RESET_RFF':
+      return {
+        ...state,
+        modifiedRffs: state.modifiedRffs.filter(
+          (rff) => rff.original.id !== action.payload.id
+        ),
       };
     case 'LOAD_RFF_ROSTER':
       return {
@@ -126,12 +200,15 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
       storedState.rffRoster = storedState.rffRoster || [];
       storedState.teachers = storedState.teachers || [];
       storedState.dutySlots = storedState.dutySlots || []; // Initialize if not present
+      storedState.manualDuties = storedState.manualDuties || []; // Initialize manualDuties
+      storedState.modifiedInheritedDuties = storedState.modifiedInheritedDuties || []; // Initialize modifiedInheritedDuties
+      // storedState.modifiedRffs = storedState.modifiedRffs || []; // Initialize modifiedRffs - Disable persistence for testing
     }
     return storedState ? { ...init, ...storedState } : init;
   });
 
   useEffect(() => {
-    storage.save(APP_STORAGE_KEY, state);
+    // storage.save(APP_STORAGE_KEY, state); // Disable persistence for testing
   }, [state]);
 
   return (

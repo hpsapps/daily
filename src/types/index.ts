@@ -77,13 +77,35 @@ import type { RFFRosterEntry } from '../utils/excelParser';
 
 
 export interface DutyAssignment {
+  id: string; // Add unique ID for duty assignments
   timeSlot: string;
   location: string;
   type: 'inherited' | 'manual';
   when: string;
+  description: string; // Add description property
+  teacherId?: string; // Add optional teacherId property
+  date?: string; // Add optional date property for manual duties
+}
+
+export interface ModifiedInheritedDuty {
+  original: {
+    dutyId: string; // Add dutyId to original for consistent matching
+    timeSlot: string;
+    teacherId: string;
+    date: string;
+  };
+  updated: DutyAssignment;
+}
+
+export interface ModifiedRff {
+  original: {
+    id: string; // Use the ScheduleEntry ID for matching
+  };
+  updated: ScheduleEntry;
 }
 
 export interface ScheduleEntry {
+  id: string; // Add unique ID for schedule entries
   time: string;
   type: 'RFF' | 'Class' | 'Duty' | 'N/A' | 'Exec Release';
   description: string;
@@ -115,6 +137,8 @@ export interface AppState {
   assignments: Assignment[];
   casualInstructions: CasualInstructions[];
   rffRoster: RFFRosterEntry[];
+  modifiedInheritedDuties: ModifiedInheritedDuty[]; // New state for modified inherited duties
+  modifiedRffs: ModifiedRff[]; // New state for modified RFFs
   lastDataUpdate: Date;
   isLoading: boolean;
   error: string | null;

@@ -1,14 +1,14 @@
 import { useState, useEffect, useContext, useMemo } from 'react';
 import { AppContext } from '../contexts/AppContext';
 import { getTermAndWeek } from '../utils/termCalculator';
-import type { DutyAssignment, Schedule, ScheduleEntry } from '../types';
+import type { DutyAssignment, Schedule, ScheduleEntry, Teacher } from '../types';
 import type { RFFRosterEntry } from '../utils/excelParser';
 import { addDays } from 'date-fns';
 
 export function useScheduleData() {
     const { state } = useContext(AppContext);
-    const { rffRoster, teachers, manualDuties, dutySlots } = state;
-    const [selectedTeacher, setSelectedTeacher] = useState('');
+    const { rffRoster, teachers, manualDuties, dutySlots, modifiedInheritedDuties, modifiedRffs } = state; // Add modifiedRffs
+    const [selectedTeacher, setSelectedTeacher] = useState<Teacher | null>(null);
     const [selectedCasual, setSelectedCasual] = useState('');
     const [selectedDates, setSelectedDates] = useState<Date[]>(() => {
         let initialDate = new Date();
@@ -32,7 +32,7 @@ export function useScheduleData() {
         } else {
             setIsLoading(true);
         }
-    }, [rffRoster, teachers, dutySlots]);
+    }, [rffRoster, teachers, dutySlots, modifiedInheritedDuties, modifiedRffs]); // Add modifiedRffs to dependencies
 
     useEffect(() => {
         // Ensure currentDateIndex is valid when selectedDates changes
@@ -62,9 +62,13 @@ export function useScheduleData() {
         const termInfo = getTermAndWeek(date);
 
         // --- Dynamic Data from AppContext ---
-        const currentTeacherInfo = teachers.find(t => t.id === selectedTeacher);
-        const teacherClass = currentTeacherInfo?.className;
-        const isRFFSpecialist = currentTeacherInfo?.role === 'RFF Specialist';
+        const currentTeacherInfo = teachers.find(t => t.id === selectedTeacher?.id);
+        if (!currentTeacherInfo) {
+            setSchedule(null);
+            return;
+        }
+        const teacherClass = currentTeacherInfo.className;
+        const isRFFSpecialist = currentTeacherInfo.role === 'RFF Specialist';
 
         // Create a map from short RFF teacher names to full teacher names (IDs)
         const rffTeacherNameToIdMap = new Map<string, string>();
@@ -85,19 +89,81 @@ export function useScheduleData() {
             );
         }
 
+        // Apply modified RFFs on top of original RFFs
+        const appliedRFFSlots = allRFFSlots.map(originalRff => {
+            const modified = modifiedRffs.find(
+                (mrff) => mrff.original.id === originalRff.id
+            );
+            // If modified, return the updated ScheduleEntry, otherwise convert originalRff to ScheduleEntry
+            if (modified) {
+                return modified.updated;
+            } else {
+                // Convert originalRff to ScheduleEntry format
+                let type: ScheduleEntry['type'] = 'RFF';
+                let description = originalRff.subject;
+                let className: string | undefined = originalRff.class;
+                let location: string | undefined = undefined;
+
+                if (isRFFSpecialist) {
+                    if (originalRff.subject?.startsWith('Exec')) {
+                        type = 'Exec Release';
+                        description = `${originalRff.subject} - ${originalRff.class}`;
+                    } else if (originalRff.class !== 'RFF') {
+                        type = 'Class';
+                        description = `${originalRff.subject} - ${originalRff.class}`;
+                    }
+                } else {
+                    description = `Class with ${originalRff.teacher} for ${originalRff.subject}`;
+                }
+
+                return {
+                    id: originalRff.id,
+                    time: originalRff.time,
+                    type: type,
+                    description: description,
+                    class: className,
+                    location: location,
+                    teacherName: currentTeacherInfo?.name,
+                };
+            }
+        });
+
         // Use dynamic dutySlots from AppContext and merge with manual duties
         const inheritedDuties = dutySlots.filter(
             (duty) => {
                 // Match duty.teacherId directly with selectedTeacher (which is the teacher's ID)
-                return duty.teacherId === selectedTeacher && duty.day === dayOfWeek;
+                return duty.teacherId === selectedTeacher.id && duty.day === dayOfWeek;
             }
         ).map(duty => ({
+            id: duty.id, // Include the duty ID
             timeSlot: duty.timeSlot,
             location: duty.area, // Map area to location
-            type: 'inherited' as 'inherited', // Cast to DutyAssignment type
-            when: duty.when, // Include the 'when' property
+            type: 'inherited' as 'inherited',
+            when: duty.when,
+            description: `${duty.when} at ${duty.area}`, // Add description property
+            teacherId: duty.teacherId, // Ensure teacherId is included
+            date: date.toLocaleDateString('en-CA', { year: 'numeric', month: '2-digit', day: '2-digit' }).replace(/\//g, '-'), // Add date
         }));
-        const duties: DutyAssignment[] = [...inheritedDuties, ...manualDuties];
+
+        // Apply modified inherited duties on top of original inherited duties
+        const appliedInheritedDuties = inheritedDuties.map(originalDuty => {
+            const modified = modifiedInheritedDuties.find(
+                (mid) =>
+                    mid.original.dutyId === originalDuty.id
+            );
+            return modified ? modified.updated : originalDuty;
+        });
+
+        const filteredManualDuties = manualDuties.filter(
+            (duty) =>
+                duty.teacherId === selectedTeacher.id &&
+                duty.date === date.toLocaleDateString('en-CA', { year: 'numeric', month: '2-digit', day: '2-digit' }).replace(/\//g, '-') &&
+                duty.timeSlot &&
+                duty.location &&
+                duty.when
+        );
+
+        const duties: DutyAssignment[] = [...appliedInheritedDuties, ...filteredManualDuties]; // Use appliedInheritedDuties
 
         const allTimeSlots = [
             "8:35-9:05", // Duty time
@@ -131,39 +197,13 @@ export function useScheduleData() {
             }
 
             const dutyAssignment = duties.find(duty => duty.timeSlot === timeSlot);
+            const rffScheduleEntry = appliedRFFSlots.find(rff => rff.time === timeSlot);
 
-            if (rffAssignment) { // This block handles RFF Specialist's direct RFF assignments
-                const entry: ScheduleEntry = {
-                    time: timeSlot,
-                    type: 'RFF',
-                    description: `${rffAssignment.subject}`,
-                    teacherName: currentTeacherInfo?.name,
-                    location: undefined, // Explicitly set to undefined
-                    class: undefined, // Explicitly set to undefined
-                };
-                if (rffAssignment.class === 'RFF') {
-                    entry.class = rffAssignment.class;
-                } else if (rffAssignment.subject?.startsWith('Exec')) {
-                    entry.type = 'Exec Release';
-                    entry.description = `${rffAssignment.subject} - ${rffAssignment.class}`;
-                    entry.class = rffAssignment.class;
-                } else {
-                    entry.type = 'Class';
-                    entry.description = `${rffAssignment.subject} - ${rffAssignment.class}`;
-                    entry.class = rffAssignment.class;
-                }
-                return entry;
-            } else if (rffClassAssignment) { // This block handles non-RFF teacher's class RFF sessions
-                return {
-                    time: timeSlot,
-                    type: 'RFF', // Display as RFF for the class
-                    description: `Class with ${rffClassAssignment.teacher} for ${rffClassAssignment.subject}`,
-                    class: rffClassAssignment.class,
-                    teacherName: currentTeacherInfo?.name,
-                    location: undefined, // Explicitly set to undefined
-                };
+            if (rffScheduleEntry) {
+                return rffScheduleEntry;
             } else if (dutyAssignment) {
                 return {
+                    id: dutyAssignment.id || crypto.randomUUID(), // Use existing ID or generate new
                     time: timeSlot,
                     type: 'Duty',
                     description: `${dutyAssignment.when} at ${dutyAssignment.location}`,
@@ -186,9 +226,10 @@ export function useScheduleData() {
             termInfo: termInfo,
             dailySchedule: dailySchedule,
         });
-    }, [selectedTeacher, selectedDates, currentDateIndex, isLoading, selectedCasual, manualDuties, rffRoster, teachers, dutySlots]);
+    }, [selectedTeacher, selectedDates, currentDateIndex, isLoading, selectedCasual, manualDuties, rffRoster, teachers, dutySlots, modifiedInheritedDuties, modifiedRffs]); // Add modifiedRffs to dependencies
 
-    const handleTeacherSelect = (teacher: string) => {
+    const handleTeacherSelect = (teacherId: string) => {
+        const teacher = teachers.find(t => t.id === teacherId) || null;
         setSelectedTeacher(teacher);
     };
 
@@ -250,5 +291,6 @@ export function useScheduleData() {
         setSpreadsheetData,
         termInfo: schedule?.termInfo,
         allTeachers,
+        setSchedule,
     };
 }

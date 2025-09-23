@@ -2,6 +2,7 @@ import * as ExcelJS from 'exceljs';
 import type { Teacher, RFFSlot, DutySlot, RFFDebt } from '../types';
 
 export interface RFFRosterEntry {
+  id: string; // Add unique ID for RFF Roster entries
   day: string;
   time: string;
   teacher: string;
@@ -66,7 +67,7 @@ const parseDutyRosterSheet = (dutyRosterSheet: ExcelJS.Worksheet): DutySlot[] =>
         const teacherName = row.getCell(headers[day])?.text;
         if (teacherName) {
           dutySlots.push({
-            id: `${day}-${normalizedTimeSlot}-${area}-${teacherName}`,
+            id: crypto.randomUUID(), // Generate a unique ID for each duty slot
             teacherId: teacherName,
             day: day,
             timeSlot: normalizedTimeSlot,
@@ -136,6 +137,7 @@ const parseRFFRosterSheet = (summarySheet: ExcelJS.Worksheet, allDaysSheet: Exce
         row.eachCell((cell, colIndex) => {
           if (colIndex > 1 && cell.text && rffTeachers[colIndex - 2] && rffClasses[colIndex - 2]) {
             rffRoster.push({
+              id: crypto.randomUUID(), // Generate a unique ID
               day: currentDay,
               time: time,
               teacher: rffTeachers[colIndex - 2],

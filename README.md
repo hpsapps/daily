@@ -11,66 +11,43 @@ The primary goal of "Daily Changes" is to streamline the process of managing tea
 *   **Frontend:** React 18+ with functional components and hooks
 *   **Styling:** Tailwind CSS + shadcn/ui components
 *   **State Management:** React Context + useReducer for complex state
-*   **File Processing:** `xlsx` library for Excel parsing
-*   **Storage:** `localStorage` for MVP (database-ready structure)
+*   **File Processing:** ExcelJS for advanced Excel parsing and generation
+*   **Backend & Storage:** Firebase (Firestore for database and Firebase Storage for file uploads)
 *   **Routing:** React Router for multi-page navigation
 *   **Build:** Vite for development and build process
 *   **TypeScript:** For type safety and improved developer experience
 
 ## Project Structure
 
-The application follows a modular project structure:
+The application follows a modular project structure, centered around features:
 
 ```
 src/
 ├── components/
-│   ├── ui/ (shadcn components)
+│   ├── features/
+│   │   ├── home-dashboard/
+│   │   ├── manual-duty/
+│   │   └── ... (other feature-specific components)
 │   ├── layout/ (e.g., Navbar)
-│   ├── upload/ (e.g., FileUploadArea)
-│   ├── absence/ (e.g., TeacherSelector)
-│   ├── assignment/ (e.g., CasualInstructionGenerator, DutyManager)
-│   ├── output/
-│   └── rff-payback/ (e.g., DebtTable, ManualEntryForm)
-│   └── settings/ (e.g., SchoolInfoForm, CasualTeacherManager, DataManagement)
+│   ├── settings/
+│   ├── rff-payback/
+│   └── ui/ (shadcn components)
 ├── contexts/ (e.g., AppContext)
 ├── hooks/
-├── utils/ (e.g., excelParser, storage)
+├── utils/ (e.g., excelParser, storage, termCalculator)
 ├── types/ (TypeScript interfaces)
-└── pages/ (Main application pages)
+└── pages/ (Main application pages: DailyCasualHome, SettingsPage, etc.)
 ```
 
-## Features Implemented (Phase 1 & Phase 2)
+## Key Features
 
-### Phase 1: Core MVP
-*   **Project Initialization & Basic Setup:**
-    *   React project initialized with Vite and TypeScript.
-    *   Tailwind CSS configured.
-    *   React Router set up for navigation.
-    *   Initial `src` directory structure created.
-*   **Core Data Models & Global State Management:**
-    *   All necessary TypeScript interfaces defined.
-    *   Global state management implemented using React Context and `useReducer`, with `localStorage` persistence.
-*   **SetupPage Component (`/setup`):**
-    *   File upload area created for `.xlsx` files.
-    *   Basic Excel parsing logic implemented with validation for required sheets and columns.
-*   **AbsenceManagementPage Component (Default Route `/`):**
-    *   Basic layout with a `TeacherSelector` (using `shadcn` Combobox).
-    *   Placeholder components for `CasualInstructionGenerator` and `DutyManager`.
-
-### Phase 2: Enhanced UX
-*   **UI/UX Refinement & Shadcn Integration:**
-    *   `shadcn/ui` components integrated throughout the application.
-    *   A `Navbar` added for easy navigation.
-*   **Robust Error Handling & Validation:**
-    *   Enhanced Excel parsing with comprehensive validation.
-*   **RFF Payback Tracking (`/rff-payback`):**
-    *   `RFFPaybackPage` layout updated.
-    *   `DebtTable`, `PaymentHistoryTable`, `ManualEntryForm`, and `DebtSummaryCards` components implemented.
-*   **Settings and Configuration (`/settings`):**
-    *   `SettingsPage` layout updated.
-    *   `SchoolInfoForm`, `CasualTeacherManager`, and `DataManagement` components implemented.
-*   **Casual Instruction Generation & Duty Management:**
-    *   `CasualInstructionGenerator` and `DutyManager` components integrated into the Absence Management page.
+*   **Centralized Dashboard:** A new `DailyCasualHome` page provides a central hub for managing daily schedules, absences, and assignments.
+*   **Firebase Integration:** Utilizes Firestore for real-time data persistence and Firebase Storage for handling file uploads, replacing the previous `localStorage` solution.
+*   **Advanced Data Handling:** Switched to `ExcelJS` for more robust and flexible parsing of uploaded school rosters and schedules.
+*   **Dynamic Schedule Management:** Enhanced calendar components that understand school term dates and allow for easy navigation between weeks and days.
+*   **Modular & Scalable Architecture:** Refactored component structure to be more feature-oriented, improving maintainability.
+*   **Comprehensive Settings:** Manage school information, casual teacher lists, and application data through a dedicated settings page.
+*   **RFF Payback Tracking:** Tools to monitor and manage RFF debts and payments.
 
 ## Getting Started
 
@@ -78,28 +55,30 @@ To run the application locally:
 
 1.  **Clone the repository:**
     ```bash
-    git clone [repository-url] daily-changes
+    git clone https://github.com/hpsapps/daily.git daily-changes
     cd daily-changes
     ```
 2.  **Install dependencies:**
     ```bash
     npm install
     ```
-3.  **Start the development server:**
+3.  **Set up Firebase:**
+    *   Create a `firebase.ts` configuration file in the `src` directory with your Firebase project credentials.
+    *   Ensure your Firestore database has the required security rules and collections.
+4.  **Start the development server:**
     ```bash
     npm run dev
     ```
-    The application will typically run on `http://localhost:5173/` (or another available port).
+    The application will typically run on `http://localhost:5173/`.
 
 ## Usage
 
-*   **Navigation:** Use the Navbar to navigate between "Absence Management", "Setup", "RFF Payback", and "Settings" pages.
-*   **Setup Page (`/setup`):** Upload an Excel file containing "RFF/Duties" and "Teacher-Class Map" sheets to populate the application with data.
-*   **Absence Management Page (`/`):** Select teachers, view conflicts, and manage assignments (currently with placeholder components).
+*   **Navigation:** Use the Navbar to navigate between the "Home" dashboard, "RFF Payback", and "Settings" pages.
+*   **Settings Page (`/settings`):** Begin here. Upload your school's teacher roster and calendar/schedule via the Excel upload areas. Configure school term dates and manage your list of casual teachers.
+*   **Home Dashboard (`/`):** View the daily schedule. Select a date to see assigned duties and classes. You can select teachers who are absent, assign casuals, and manage any resulting changes directly from the dashboard.
 *   **RFF Payback Page (`/rff-payback`):** View current and cleared RFF debts, add new debts manually, and see a summary.
-*   **Settings Page (`/settings`):** Manage school information, casual teachers, and export application data.
 
-## Next Steps (Phase 3)
+## Next Steps
 
 *   Advanced Assignment Features
 *   Print-Optimized Output & Export
