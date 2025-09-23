@@ -2,8 +2,7 @@ import { useMemo, useContext } from 'react';
 import { format } from 'date-fns';
 import { ChevronLeft, ChevronRight, RotateCcw, X, Edit } from 'lucide-react';
 import { Button } from '../../ui/button';
-import type { Schedule, ScheduleEntry, DutyAssignment, Teacher } from '../../../types';
-import type { RFFRosterEntry } from '../../../utils/excelParser';
+import type { Schedule, ScheduleEntry } from '../../../types';
 import { cn } from '../../../utils/cn';
 import { AppContext } from '../../../contexts/AppContext';
 
@@ -15,18 +14,18 @@ interface EditableScheduleCardProps {
     onNextDate: () => void;
     termInfo?: { term?: number; week?: number; type: 'term' | 'holiday' | 'development'; description: string };
     onAddManualDutyClick: () => void;
-    selectedTeacher: Teacher | null;
+    selectedTeacher: { id: string; name: string; className?: string } | null; // Make className optional
     onEditDutyClick: (entry: ScheduleEntry) => void;
     onResetDuty: (entry: ScheduleEntry) => void;
     onRemoveDuty: (entry: ScheduleEntry) => void;
     onEditRffClick: (entry: ScheduleEntry) => void;
     onResetRff: (entry: ScheduleEntry) => void;
     isEditDutyModalOpen: boolean;
-    onOpenChangeEditDutyModal: (open: boolean) => void;
+    onOpenChangeEditDutyModal: (isOpen: boolean) => void;
     editingDutyEntry: ScheduleEntry | null;
     onSaveEditedDuty: (originalEntry: ScheduleEntry, updatedEntry: ScheduleEntry) => void;
     isReassignRffModalOpen: boolean;
-    onOpenChangeReassignRffModal: (open: boolean) => void;
+    onOpenChangeReassignRffModal: (isOpen: boolean) => void;
     editingRffEntry: ScheduleEntry | null;
     onSaveReassignedRff: (originalEntry: ScheduleEntry, updatedEntry: ScheduleEntry) => void;
 }
@@ -39,23 +38,14 @@ export function EditableScheduleCard({
     onNextDate,
     termInfo,
     onAddManualDutyClick,
-    selectedTeacher,
     onEditDutyClick,
     onResetDuty,
     onRemoveDuty,
     onEditRffClick,
     onResetRff,
-    isEditDutyModalOpen,
-    onOpenChangeEditDutyModal,
-    editingDutyEntry,
-    onSaveEditedDuty,
-    isReassignRffModalOpen,
-    onOpenChangeReassignRffModal,
-    editingRffEntry,
-    onSaveReassignedRff,
 }: EditableScheduleCardProps) {
-    const { state, dispatch } = useContext(AppContext);
-    const { manualDuties, dutySlots, rffRoster } = state;
+    const { state } = useContext(AppContext);
+    const { manualDuties, dutySlots } = state;
 
     const sortedDates = useMemo(() => {
         return [...selectedDates].sort((a, b) => a.getTime() - b.getTime());
@@ -124,13 +114,12 @@ export function EditableScheduleCard({
             ) : (
                 <div className="space-y-3">
                     {schedule.dailySchedule.length > 0 ? (
-                        schedule.dailySchedule.map((entry: ScheduleEntry, index: number) => {
+                        schedule.dailySchedule.map((entry: ScheduleEntry) => {
                             let timeslotClass = "p-4 rounded-lg";
                             let badgeText = "";
                             let badgeClass = "";
                             let description = entry.description;
 
-                            const normalizedEntryLocation = entry.location || ''; // Normalize entry.location
                             const isManualDuty = manualDuties.some(
                                 (md) => md.id === entry.id // Match by ID
                             );

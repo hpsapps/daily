@@ -5,17 +5,16 @@ import { useTeacherAndCasualLists } from '../hooks/useTeacherAndCasualLists';
 import { TeacherSearchCard } from '../components/features/home-dashboard/TeacherSearchCard';
 import { EditableScheduleCard } from '../components/features/home-dashboard/EditableScheduleCard';
 import { AssignCasualCard } from '../components/features/home-dashboard/AssignCasualCard';
-// import { AssignmentPreview } from '../components/features/home-dashboard/AssignmentPreview'; // No longer needed
+import { AssignmentPreview } from '../components/features/home-dashboard/AssignmentPreview';
 import AddManualDutyDialog from '../components/features/manual-duty/AddManualDutyDialog';
 import { Card } from '@/components/ui/card';
 import { EditDutyDialog } from '../components/features/home-dashboard/EditDutyDialog'; // Import EditDutyDialog
 import ReassignRffDialog from '../components/features/home-dashboard/ReassignRffDialog'; // Import ReassignRffDialog
 import type { ScheduleEntry, DutyAssignment } from '../types'; // Import ScheduleEntry and DutyAssignment types
-import type { RFFRosterEntry } from '../utils/excelParser'; // Import RFFRosterEntry
 
 function DailyCasualHome() {
     const { state, dispatch } = useContext(AppContext);
-    const { dutySlots, rffRoster, teachers, manualDuties } = state;
+    const { dutySlots, rffRoster, manualDuties } = state;
     const [isAddDutyModalOpen, setIsAddDutyModalOpen] = useState(false);
     const [isEditDutyModalOpen, setIsEditDutyModalOpen] = useState(false);
     const [editingDutyEntry, setEditingDutyEntry] = useState<ScheduleEntry | null>(null);
@@ -132,8 +131,6 @@ function DailyCasualHome() {
 
     const handleResetDuty = (entryToReset: ScheduleEntry) => {
         if (!schedule || !selectedTeacher) return;
-
-        const currentDateFormatted = schedule.date;
 
         // Find the corresponding modified inherited duty to get its original properties
         const modifiedEntry = state.modifiedInheritedDuties.find(
@@ -269,31 +266,38 @@ function DailyCasualHome() {
                 {selectedTeacher && (
                     <Card className="p-6 mb-8 border" id="schedule-and-preview">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div className="flex flex-col">
-                            <EditableScheduleCard
-                                schedule={schedule}
-                                selectedDates={selectedDates}
-                                currentDateIndex={currentDateIndex}
-                                onPreviousDate={handlePreviousDate}
-                                onNextDate={handleNextDate}
-                                termInfo={termInfo}
-                                onAddManualDutyClick={() => setIsAddDutyModalOpen(true)}
-                                selectedTeacher={selectedTeacher}
-                                onEditDutyClick={handleEditDutyClick}
-                                onResetDuty={handleResetDuty}
-                                onRemoveDuty={handleRemoveDuty}
-                                onEditRffClick={handleEditRffClick}
-                                onResetRff={handleResetRff}
-                                isEditDutyModalOpen={isEditDutyModalOpen}
-                                onOpenChangeEditDutyModal={setIsEditDutyModalOpen}
-                                editingDutyEntry={editingDutyEntry}
-                                onSaveEditedDuty={handleSaveEditedDuty}
-                                isReassignRffModalOpen={isReassignRffModalOpen}
-                                onOpenChangeReassignRffModal={setIsReassignRffModalOpen}
-                                editingRffEntry={editingRffEntry}
-                                onSaveReassignedRff={handleSaveReassignedRff}
-                            />
-                        </div>
+                            <div className="flex flex-col">
+                                <EditableScheduleCard
+                                    schedule={schedule}
+                                    selectedDates={selectedDates}
+                                    currentDateIndex={currentDateIndex}
+                                    onPreviousDate={handlePreviousDate}
+                                    onNextDate={handleNextDate}
+                                    termInfo={termInfo}
+                                    onAddManualDutyClick={() => setIsAddDutyModalOpen(true)}
+                                    selectedTeacher={selectedTeacher}
+                                    onEditDutyClick={handleEditDutyClick}
+                                    onResetDuty={handleResetDuty}
+                                    onRemoveDuty={handleRemoveDuty}
+                                    onEditRffClick={handleEditRffClick}
+                                    onResetRff={handleResetRff}
+                                    isEditDutyModalOpen={isEditDutyModalOpen}
+                                    onOpenChangeEditDutyModal={setIsEditDutyModalOpen}
+                                    editingDutyEntry={editingDutyEntry}
+                                    onSaveEditedDuty={handleSaveEditedDuty}
+                                    isReassignRffModalOpen={isReassignRffModalOpen}
+                                    onOpenChangeReassignRffModal={setIsReassignRffModalOpen}
+                                    editingRffEntry={editingRffEntry}
+                                    onSaveReassignedRff={handleSaveReassignedRff}
+                                />
+                            </div>
+                            <div className="flex flex-col">
+                                <AssignmentPreview
+                                    schedule={schedule}
+                                    selectedCasual={selectedCasual}
+                                    onGenerateSpreadsheet={() => console.log('Generate Spreadsheet Clicked')}
+                                />
+                            </div>
                         </div>
                     </Card>
                 )}

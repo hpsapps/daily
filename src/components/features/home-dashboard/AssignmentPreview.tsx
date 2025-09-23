@@ -2,18 +2,20 @@ import { useState } from 'react';
 import { Button } from '../../ui/button';
 import { Construction } from 'lucide-react';
 import type { Schedule, ScheduleEntry } from '../../../types'; // Import Schedule and ScheduleEntry types
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '../../ui/dialog'; // Import Dialog components
 
 interface AssignmentPreviewProps {
     schedule: Schedule | null;
-    onSpreadsheetDataChange: (data: string) => void;
     selectedCasual: string | null;
     onGenerateSpreadsheet: () => void;
-    onAddManualDutyClick: () => void;
-    setSchedule: React.Dispatch<React.SetStateAction<Schedule | null>>; // Add setSchedule prop
 }
 
-export function AssignmentPreview({ schedule, onSpreadsheetDataChange, selectedCasual, onGenerateSpreadsheet, onAddManualDutyClick, setSchedule }: AssignmentPreviewProps) {
-    const [showMessage] = useState(false);
+export function AssignmentPreview({ schedule, selectedCasual, onGenerateSpreadsheet }: AssignmentPreviewProps) {
+    const [isUnderConstructionModalOpen, setIsUnderConstructionModalOpen] = useState(false);
+
+    const handleUnderConstructionClick = () => {
+        setIsUnderConstructionModalOpen(true);
+    };
 
     // If no schedule or no selected casual, display a message or null
     if (!schedule || !selectedCasual) {
@@ -70,9 +72,6 @@ export function AssignmentPreview({ schedule, onSpreadsheetDataChange, selectedC
         });
 
         const dutyString = `"${duties.join('\n')}"`;
-        const rffString = `"${rffs.join('\n')}"`;
-        const classString = `"${classes.join('\n')}"`;
-        const execReleaseString = `"${execReleases.join('\n')}"`;
 
         // For RFF specialists, we want to include their classes and exec releases in the RFF column,
         // or perhaps in a combined "Schedule" column.
@@ -90,6 +89,32 @@ export function AssignmentPreview({ schedule, onSpreadsheetDataChange, selectedC
             <h2 className="text-xl font-semibold mb-4 flex items-center">
                 {selectedCasual ? `Preview Day for ${selectedCasual}` : 'Spreadsheet Preview'}
             </h2>
+
+            <div className="flex space-x-2 mt-4 mb-4">
+                <Button onClick={() => navigator.clipboard.writeText(generateSpreadsheetContent())}>
+                    Copy to Clipboard
+                </Button>
+                <Button onClick={handleUnderConstructionClick} disabled={!schedule}>
+                    Send to Spreadsheet
+                </Button>
+                <Button onClick={handleUnderConstructionClick} disabled={!schedule || !selectedCasual}>
+                    Send to Casual
+                </Button>
+            </div>
+
+            <Dialog open={isUnderConstructionModalOpen} onOpenChange={setIsUnderConstructionModalOpen}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle className="flex items-center">
+                            <Construction className="mr-2 h-5 w-5 text-yellow-500" />
+                            Under Construction!
+                        </DialogTitle>
+                        <DialogDescription>
+                            This feature is still being built. We need more funding for this awesome functionality!
+                        </DialogDescription>
+                    </DialogHeader>
+                </DialogContent>
+            </Dialog>
             <div className="w-full p-3 border rounded-md bg-secondary whitespace-pre-wrap">
                 {schedule.dailySchedule.length > 0 ? (
                     schedule.dailySchedule.map((entry, index) => (
@@ -100,30 +125,6 @@ export function AssignmentPreview({ schedule, onSpreadsheetDataChange, selectedC
                 )}
             </div>
 
-            <div className="flex space-x-2 mt-4">
-                <Button variant="secondary" onClick={onAddManualDutyClick}>
-                    Add Manual Duty
-                </Button>
-                <Button onClick={() => navigator.clipboard.writeText(generateSpreadsheetContent())}>
-                    Copy to Clipboard
-                </Button>
-            </div>
-
-            {showMessage && (
-                <div className="rounded-md bg-amber-50 p-4 mt-4">
-                    <div className="flex">
-                        <div className="flex-shrink-0">
-                            <Construction className="h-5 w-5 text-amber-800" />
-                        </div>
-                        <div className="ml-3">
-                            <h3 className="text-sm font-medium text-amber-800">Feature in Progress...</h3>
-                            <div className="mt-2 text-sm text-amber-800">
-                                <p>Yeah, one day!!</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            )}
         </div>
     );
 }

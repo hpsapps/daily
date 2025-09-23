@@ -1,5 +1,5 @@
 import { createContext, useReducer, type ReactNode, useEffect } from 'react';
-import type { AppState, Teacher, DutySlot, RFFDebt, CasualTeacher, DutyAssignment, ModifiedRff, ScheduleEntry } from '../types';
+import type { AppState, Teacher, DutySlot, RFFDebt, CasualTeacher, DutyAssignment, ModifiedRff } from '../types';
 import type { RFFRosterEntry } from '../utils/excelParser';
 import { storage } from '../utils/storage';
 
