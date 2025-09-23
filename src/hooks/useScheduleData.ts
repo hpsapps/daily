@@ -70,13 +70,6 @@ export function useScheduleData() {
         const teacherClass = currentTeacherInfo.className;
         const isRFFSpecialist = currentTeacherInfo.role === 'RFF Specialist';
 
-        // Create a map from short RFF teacher names to full teacher names (IDs)
-        const rffTeacherNameToIdMap = new Map<string, string>();
-        teachers.forEach(t => {
-            // Assuming short names are the first word of the full name
-            const shortName = t.name.split(' ')[0];
-            rffTeacherNameToIdMap.set(shortName, t.id);
-        });
 
         let allRFFSlots: RFFRosterEntry[] = [];
         if (isRFFSpecialist) {
@@ -181,21 +174,6 @@ export function useScheduleData() {
         ];
 
         const dailySchedule: ScheduleEntry[] = allTimeSlots.map(timeSlot => {
-            const selectedTeacherShortName = currentTeacherInfo?.name.split(' ')[0];
-
-            // Find RFF assignments for the selected teacher (RFF Specialist's direct assignments)
-            const rffAssignment = rffRoster.find(rff => {
-                return isRFFSpecialist && rff.day === dayOfWeek && rff.time === timeSlot && rff.teacher === selectedTeacherShortName;
-            });
-
-            // Find RFF assignments for the selected teacher's class (for non-RFF Specialists)
-            let rffClassAssignment: RFFRosterEntry | undefined;
-            if (!isRFFSpecialist && teacherClass) {
-                rffClassAssignment = rffRoster.find(rff =>
-                    rff.day === dayOfWeek && rff.time === timeSlot && rff.class === teacherClass
-                );
-            }
-
             const dutyAssignment = duties.find(duty => duty.timeSlot === timeSlot);
             const rffScheduleEntry = appliedRFFSlots.find(rff => rff.time === timeSlot);
 
