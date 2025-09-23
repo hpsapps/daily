@@ -17,6 +17,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
+  DialogDescription,
 } from "@/components/ui/dialog";
 import type { CasualTeacher } from '../../types';
 
@@ -127,6 +128,9 @@ const CasualTeacherManager = () => {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Add New Casual Teacher</DialogTitle>
+            <DialogDescription>
+              Add a new casual teacher to the system.
+            </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <div className="grid grid-cols-4 items-center gap-4">
@@ -177,6 +181,9 @@ const CasualTeacherManager = () => {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Edit Casual Teacher</DialogTitle>
+            <DialogDescription>
+              Edit the details of the selected casual teacher.
+            </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <div className="grid grid-cols-4 items-center gap-4">

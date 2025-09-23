@@ -1,4 +1,3 @@
-import { Button } from '../../ui/button';
 import { Label } from '../../ui/label';
 import { TeacherCasualSearch } from '../../custom/TeacherCasualSearch';
 import { CheckCircle } from 'lucide-react';
@@ -9,7 +8,6 @@ interface AssignCasualCardProps {
     selectedTeacher: string;
     isLoading: boolean;
     onCasualSelect: (casual: string) => void;
-    onGenerateSpreadsheet: () => void;
 }
 
 export function AssignCasualCard({
@@ -17,8 +15,7 @@ export function AssignCasualCard({
     selectedCasual,
     selectedTeacher,
     isLoading,
-    onCasualSelect,
-    onGenerateSpreadsheet
+    onCasualSelect
 }: AssignCasualCardProps) {
     return (
         <div className='p-4 mb-8' id="assign-casual-card">
@@ -55,11 +52,6 @@ export function AssignCasualCard({
                         </div>
                     </div>
                     
-                    <div className="mt-4">
-                        <Button onClick={onGenerateSpreadsheet}>
-                            Load Details
-                        </Button>
-                    </div>
                 </div>
             )}
         </div>
