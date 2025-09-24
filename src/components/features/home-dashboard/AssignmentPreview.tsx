@@ -110,7 +110,9 @@ export function AssignmentPreview({ schedule, selectedCasual, onGenerateSpreadsh
                             Under Construction!
                         </DialogTitle>
                         <DialogDescription>
-                            This feature is still being built. We need more funding for this awesome functionality!
+                            <p>This feature is in the pipeline.</p>
+                            <p>We need some funding to bring this awesome functionality to life!</p>
+                            <p>😜</p>
                         </DialogDescription>
                     </DialogHeader>
                 </DialogContent>
