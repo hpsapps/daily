@@ -73,10 +73,12 @@ export function useScheduleData() {
 
         let allRFFSlots: RFFRosterEntry[] = [];
         if (isRFFSpecialist) {
+            // For RFF specialists, filter by their name in the 'teacher' field
             allRFFSlots = rffRoster.filter(rff =>
-                rff.day === dayOfWeek && rff.teacher === currentTeacherInfo?.name.split(' ')[0] && rff.class === 'RFF' // Match by short name
+                rff.day === dayOfWeek && rff.teacher === currentTeacherInfo?.name.split(' ')[0]
             );
         } else if (teacherClass) {
+            // For general teachers, filter by their class name
             allRFFSlots = rffRoster.filter(rff =>
                 rff.day === dayOfWeek && rff.class === teacherClass
             );
